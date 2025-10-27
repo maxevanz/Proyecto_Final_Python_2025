@@ -1,10 +1,19 @@
-create database test;
-use test;
+create database Porteria;
+use Porteria;
 
+CREATE TABLE IF NOT EXISTS Empleado (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	Apellido VARCHAR(50) NOT NULL,
+	Nombre VARCHAR(50) NOT NULL,
+	Correo VARCHAR(150) NOT NULL,
+	Telefono VARCHAR(15) NOT NULL,
+	Estado BOOLEAN NOT NULL DEFAULT True,
+	PRIMARY KEY(id)
+);
 
 CREATE TABLE IF NOT EXISTS Usuario (
 	id INTEGER NOT NULL AUTO_INCREMENT,
-	Username VARCHAR(50) NOT NULL,
+	NombreUsuario VARCHAR(50) NOT NULL UNIQUE,
 	Contraseña VARCHAR(255) NOT NULL,
 	Rol ENUM('admin', 'supervisor', 'usuario') NOT NULL,
 	Estado BOOLEAN NOT NULL,
@@ -13,25 +22,15 @@ CREATE TABLE IF NOT EXISTS Usuario (
     foreign key(id_empleado) references Empleado(id)
 );
 
-
-CREATE TABLE IF NOT EXISTS Empleado (
-	id INTEGER NOT NULL AUTO_INCREMENT,
-	Apellido VARCHAR(50) NOT NULL,
-	Nombre VARCHAR(50) NOT NULL,
-	Correo VARCHAR(150) NOT NULL,
-	Telefono VARCHAR(11) NOT NULL,
-	Estado BOOLEAN NOT NULL DEFAULT True,
-	PRIMARY KEY(id)
-);
-
 CREATE TABLE IF NOT EXISTS Eventos(
 	id integer not null auto_increment,
     tipo enum('ingreso','egreso','paqueteria','visitas','otros') not null,
     fecha datetime default current_timestamp not null,
     observaciones varchar(500),
-    id_empleado integer not null,
+    id_usuario integer not null,
     primary key(id),
-    foreign key(id_empleado) references empleado(id)
+    foreign key(id_usuario) references Usuario(id),
+    INDEX(fecha)
 );
 
 
@@ -44,11 +43,13 @@ values
 
 select * from usuario;
 
-insert into usuario(username,contraseña,rol,estado,id_empleado)
+update usuario set NombreUsuario = '1234' WHERE id = 1;
+
+insert into usuario(nombreusuario,contraseña,rol,estado,id_empleado)
 values
 ('pepex','1234','admin',1,1);
 
 select * from Eventos;
-insert into Eventos(tipo,observaciones,id_empleado)
+insert into Eventos(tipo,observaciones,id_usuario)
 values
-('paqueteria','Paquete de ML para Diego de la Vega, del 3ro C',2)
+('paqueteria','Paquete de ML para Diego de la Vega, del 3ro C',1)
