@@ -66,12 +66,8 @@ class VistaEmpleado(tk.Frame):
         self.mostrar_grilla()
         self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
         #Pintar las filas inactivas
-<<<<<<< HEAD
         #self.grilla.tag_configure("estado0", foreground="red")  # para pintar los empleados Inactivos
         self.grilla.tag_configure("estado0", background="#f2dede")  # rojo claro
-=======
-        self.grilla.tag_configure("estado0", foreground="red")  # para pintar los empleados Inactivos
->>>>>>> 6d8a6ddd699659abea0c6836ca7d6adc65ddb472
 
 
     ######METODOS###########
