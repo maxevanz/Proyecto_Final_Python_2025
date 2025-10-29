@@ -23,8 +23,10 @@ class LoginFrame(tk.Frame):
         usuario = self.usuario_entry.get()
         contrasena = self.contrasena_entry.get()
 
-        if self.controlador.verificar_credeciales(usuario, contrasena):
+        usuario_actual = UsuarioControlador.obtener_usuario(usuario, contrasena)
+
+        if usuario_actual:
             self.pack_forget()
-            self.mostrar_pantalla_principal()
+            self.mostrar_pantalla_principal(usuario_actual["NombreUsuario"], usuario_actual["Rol"])    # ← pasamos el nombre
         else:
             messagebox.showerror("ERROR","Credenciales Incorrectas")
