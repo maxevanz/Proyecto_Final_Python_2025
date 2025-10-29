@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #pip install bcrypt         -> alagoritmo de Hash para encriptar contraseñas
 
 import mysql.connector
@@ -168,3 +169,11 @@ class UsuarioControlador:
             if conn:
                 conn.close()
 
+=======
+from Modelo.usuario import UsuarioModelo
+
+class UsuarioControlador:
+    def verificar_credeciales(self, username, password):
+        usuario = UsuarioModelo.obtener_usuario(username, password)
+        return usuario
+>>>>>>> 6d8a6ddd699659abea0c6836ca7d6adc65ddb472
