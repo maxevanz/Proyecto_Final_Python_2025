@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Controlador.usuarioControlador import UsuarioControlador
 from Modelo.usuario import UsuarioModelo
+from Utilidades.validador_campos import ValidadorCampos
 
 class VistaUsuario(tk.Frame):
     def __init__(self, master):
@@ -13,14 +14,19 @@ class VistaUsuario(tk.Frame):
         self.crear_formulario()
         self.mostrar_grilla()
 
+
+    ######METODOS###########
     def crear_formulario(self):
 
         ####SECCION LABEL Y ENTRYS####
         self.controles_formulario = tk.Frame(self)
         self.controles_formulario.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
         
         tk.Label(self.controles_formulario, text="Nombre de Usuario: ").grid(row=0, column=0, sticky="e")
-        self.nombre_usuario_entry = tk.Entry(self.controles_formulario, width=50)
+        # #validacion
+        vcmd = self.register(ValidadorCampos.caracteres_permitidos)
+        self.nombre_usuario_entry = tk.Entry(self.controles_formulario, validate="key", validatecommand=(vcmd, "%P"), width=50)
         self.nombre_usuario_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Contraseña: ").grid(row=1, column=0, sticky="e")
@@ -28,7 +34,7 @@ class VistaUsuario(tk.Frame):
         self.contraseña_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Rol: ").grid(row=2, column=0, sticky="e")
-        self.rol_combo = ttk.Combobox(self.controles_formulario, width=50, values=["admin", "supervisor", "usuario"], state="readonly")
+        self.rol_combo = ttk.Combobox(self.controles_formulario, width=30, values=["admin", "supervisor", "usuario"], state="readonly")
         self.rol_combo.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         self.rol_combo.current(0)
 
@@ -38,7 +44,7 @@ class VistaUsuario(tk.Frame):
         self.estado_check.grid(row=3, column=1, padx=5)
 
         tk.Label(self.controles_formulario, text="Empleado: ").grid(row=4, column=0, sticky="e")
-        self.empleado_combo = ttk.Combobox(self.controles_formulario, width=50, state="readonly")
+        self.empleado_combo = ttk.Combobox(self.controles_formulario, width=30, state="readonly")
         self.empleado_combo.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
         self.cargar_empleados_disponibles()
 
@@ -59,6 +65,17 @@ class VistaUsuario(tk.Frame):
         self.boton_eliminar = tk.Button(self.botones_frame, text="Limpiar", command=self.limpiar_formulario)
         self.boton_eliminar.grid(row=3, column=0, pady=5)
 
+        ###Seccion Busqueda###
+        self.busqueda_frame = tk.Frame(self)
+        self.busqueda_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+        self.busqueda_frame.columnconfigure(1, weight=1)
+
+        tk.Label(self.busqueda_frame, text="Buscar: ").grid(row=0, column=0, sticky="w", padx=5)
+        self.buscar_var = tk.StringVar()
+        self.buscar_entry = tk.Entry(self.busqueda_frame, textvariable=self.buscar_var)
+        self.buscar_entry.grid(row=0, column=1, sticky="ew", padx=5)
+        self.buscar_var.trace_add("write", self.buscar_usuario)
+
     def mostrar_grilla(self):       
         columnas = ("Id", "Usuario", "Rol", "Estado", "Empleado")
         self.grilla = ttk.Treeview(self, columns=columnas, show="headings")
@@ -78,7 +95,7 @@ class VistaUsuario(tk.Frame):
     def seleccionar_usuario(self, event):
         seleccionado = self.grilla.focus()
         self.boton_crear.config(state=tk.DISABLED)
-        
+
         if not seleccionado:
             return 
         valores = self.grilla.item(seleccionado, "values")
@@ -100,9 +117,9 @@ class VistaUsuario(tk.Frame):
 
         for row in self.grilla.get_children():
             self.grilla.delete(row)
-        usuarios = self.controlador.obtener_usuarios()
+        self.usuarios = self.controlador.obtener_usuarios()
         
-        for usuario in usuarios:
+        for usuario in self.usuarios:
             # Guardar contraseña por ID
             self.contraseñas_por_id[usuario[0]] = usuario[2]  # usuario[0] = id, usuario[2] = contraseña
 
@@ -112,6 +129,28 @@ class VistaUsuario(tk.Frame):
             estado_texto = "Activo" if estado == 1 else "Inactivo"
             valores = (usuario[0], usuario[1], usuario[3], estado_texto, usuario[5])  # omitimos la contraseña
             self.grilla.insert("", tk.END, values=valores, tags=(tag,))
+
+    def buscar_usuario(self, *args):
+        texto = self.buscar_var.get().lower()
+
+        for item in self.grilla.get_children():
+            self.grilla.delete(item)
+
+        for usuario in self.usuarios:
+            # Guardar contraseña por ID
+            self.contraseñas_por_id[usuario[0]] = usuario[2]  # usuario[0] = id, usuario[2] = contraseña
+
+            # Insertar solo columnas visibles
+            estado = usuario[4]  # ahora el estado está en la posición 4
+            tag = "Inactivo" if estado == 0 else ""
+            estado_texto = "Activo" if estado == 1 else "Inactivo"
+            valores = f"{usuario[0]} {usuario[1]} {usuario[3]} {estado_texto} {usuario[5]}" # omitimos la contraseña
+            if texto in valores:
+                 self.grilla.insert(
+                     "",tk.END,
+                     values=(usuario[0], usuario[1], usuario[3], estado_texto, usuario[5]),
+                     tags=(tag,)
+                 )
 
     def cargar_empleados_disponibles(self):
         empleados = self.controlador.obtener_empleados_disponibles()
@@ -157,7 +196,7 @@ class VistaUsuario(tk.Frame):
             messagebox.showerror("Error", mensaje)
 
     def editar_usuario(self):
-        if not hasattr(self, "usuario_id"):
+        if not self.usuario_id:
             messagebox.showerror("Error","Seleecione un usuario para editar")
             return
         
@@ -199,12 +238,14 @@ class VistaUsuario(tk.Frame):
         self.nombre_usuario_entry.config(state=tk.NORMAL)
         self.empleado_combo.config(state=tk.NORMAL)
 
-
+        self.usuario_id = None
         self.nombre_usuario_entry.delete(0, tk.END)
         self.contraseña_entry.delete(0, tk.END)
         self.rol_combo.current(0)
         self.estado_var.set(True)
         self.empleado_combo.set("")
+        self.buscar_entry.delete(0, tk.END)
+        self.buscar_var.set("")
 
         self.nombre_usuario_entry.focus()
         

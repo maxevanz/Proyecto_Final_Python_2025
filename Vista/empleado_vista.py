@@ -1,7 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, StringVar
-
+from tkinter import ttk, messagebox
 from Controlador.empleadoControlador import EmpleadoControlador
+from Modelo.empleado import EmpleadoModelo
+from Utilidades.validador_campos import ValidadorCampos
+
 
 class VistaEmpleado(tk.Frame):
     #####INICIALIZADOR
@@ -10,25 +12,40 @@ class VistaEmpleado(tk.Frame):
         self.controlador = EmpleadoControlador()
         self.empleado_seleccionado = None
 
+        ###Cargar Formulario###
+        self.crear_formulario()
+
+        #Mostrar la lista de empleados
+        self.mostrar_grilla()
+        self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        #Pintar las filas inactivas
+        #self.grilla.tag_configure("estado0", foreground="red")  # para pintar los empleados Inactivos
+        self.grilla.tag_configure("estado0", background="#f2dede")  # rojo claro
+
+
+    ######METODOS###########
+    def crear_formulario(self):
         ######Seccion Formulario(label y entrys)
         self.controles_formulario = tk.Frame(self)
         self.controles_formulario.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
         tk.Label(self.controles_formulario, text="Apellido:").grid(row=0, column=0, sticky="e")
-        self.apellido_entry = tk.Entry(self.controles_formulario)
-        self.apellido_entry.grid(row=0, column=1)
+        self.apellido_entry = tk.Entry(self.controles_formulario, width=50)
+        self.apellido_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Nombre:").grid(row=1, column=0, sticky="e")
-        self.nombre_entry = tk.Entry(self.controles_formulario)
-        self.nombre_entry.grid(row=1, column=1)
+        self.nombre_entry = tk.Entry(self.controles_formulario, width=50)
+        self.nombre_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Correo:").grid(row=2, column=0, sticky="e")
-        self.correo_entry = tk.Entry(self.controles_formulario)
-        self.correo_entry.grid(row=2, column=1)
+        self.correo_entry = tk.Entry(self.controles_formulario, width=50)
+        self.correo_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Telefono:").grid(row=3, column=0, sticky="e")
-        self.telefono_entry = tk.Entry(self.controles_formulario)
-        self.telefono_entry.grid(row=3, column=1)
+        #validacion
+        vcmd = self.register(ValidadorCampos.validar_telefono)
+        self.telefono_entry = tk.Entry(self.controles_formulario, validate="key", validatecommand=(vcmd, "%P"), width=50)
+        self.telefono_entry.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Estado:").grid(row=4, column=0, sticky="e")
         self.estado_var = tk.BooleanVar()
@@ -38,7 +55,7 @@ class VistaEmpleado(tk.Frame):
 
         ####Seccion Botones
         self.botones = tk.Frame(self)
-        self.botones.grid(row=0, column=1, sticky="n", pady=10)
+        self.botones.grid(row=0, column=1, pady=10, padx=10, sticky="e")
 
         self.boton_crear = tk.Button(self.botones, text="Crear", command=self.nuevo_empleado)
         self.boton_crear.grid(row=0, column=0, pady=5)
@@ -54,23 +71,12 @@ class VistaEmpleado(tk.Frame):
         self.busqueda_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
         self.busqueda_frame.columnconfigure(1, weight=1)
 
-        tk.Label(self.busqueda_frame, text="Buscar").grid(row=0, column=0, sticky="w", padx=5)
+        tk.Label(self.busqueda_frame, text="Buscar: ").grid(row=0, column=0, sticky="w", padx=5)
         self.buscar_var = tk.StringVar()
         self.buscar_entry = tk.Entry(self.busqueda_frame, textvariable=self.buscar_var)
         self.buscar_entry.grid(row=0, column=1, sticky="ew", padx=5)
         self.buscar_var.trace_add("write", self.buscar_empleados)
 
-
-
-        #Mostrar la lista de empleados
-        self.mostrar_grilla()
-        self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
-        #Pintar las filas inactivas
-        #self.grilla.tag_configure("estado0", foreground="red")  # para pintar los empleados Inactivos
-        self.grilla.tag_configure("estado0", background="#f2dede")  # rojo claro
-
-
-    ######METODOS###########
     def mostrar_grilla(self):
         # TreeView para mostrar empleados
         self.grilla = ttk.Treeview(self, columns=("id","Apellido","Nombre","Correo","Telefono","Estado"), show="headings")
@@ -90,7 +96,7 @@ class VistaEmpleado(tk.Frame):
     def actualizar_lista(self):
         for item in self.grilla.get_children():
             self.grilla.delete(item)
-        self.empleados = self.controlador.lista_empleados()
+        self.empleados = self.controlador.obtener_todos()
  
 
         for e in self.empleados:
@@ -152,13 +158,26 @@ class VistaEmpleado(tk.Frame):
                 )
     
     def nuevo_empleado(self):
+
         apellido = self.nombre_entry.get()
         nombre = self.apellido_entry.get()
         correo = self.correo_entry.get()
         telefono = self.telefono_entry.get()
         estado = 1
 
-        exito, mensaje = self.controlador.nuevo_empleado(apellido, nombre, correo, telefono, estado)
+        #validacion
+        if not apellido or not nombre or not correo:
+            messagebox.showerror("Atención","Todos los campos son obligatorios.")
+            return
+        empleado = EmpleadoModelo(
+            apellido=apellido,
+            nombre=nombre,
+            correo=correo,
+            telefono=telefono,
+            estado=estado
+        )
+
+        exito, mensaje = self.controlador.nuevo_empleado(empleado)
         messagebox.showinfo("Resultado", mensaje)
         
         if exito:
@@ -166,38 +185,45 @@ class VistaEmpleado(tk.Frame):
             self.limpiar_campos()
 
     def editar_empleado(self):
-
-        if not self.empleado_seleccionado:
-            messagebox.showerror("Advertencia","Debe seleccionar un empleado")
-            return
-
-        id = self.empleado_seleccionado.id
-        apellido = self.apellido_entry.get()
-        nombre = self.nombre_entry.get()
-        correo = self.correo_entry.get()
-        telefono = self.telefono_entry.get()
-        estado = 1 if self.estado_var.get() else 0
-
-        exito, mensaje = self.controlador.editar_empleado(id, apellido, nombre, correo, telefono, estado)
-        messagebox.showinfo("Resultado", mensaje)
-
-        if exito:
-            self.actualizar_lista()
-            self.limpiar_campos()
-
-    def eliminar_empleado(self):
         if not self.empleado_seleccionado:
             messagebox.showerror("Advertencia","Debe seleccionar un empleado")
             return
         
-        if hasattr(self, 'empleado_seleccionado'):
-            exito, mensaje = self.controlador.eliminar_empleado(self.empleado_seleccionado.id)
-            messagebox.showinfo("Resultado", mensaje)
+        #Validacion
+        empleado = EmpleadoModelo(
+            id=self.empleado_seleccionado.id,
+            apellido=self.apellido_entry.get(),
+            nombre=self.nombre_entry.get(),
+            correo=self.correo_entry.get(),
+            telefono=self.telefono_entry.get(),
+            estado= 1 if self.estado_var.get() else 0
+        )
 
-            if exito:
-                self.actualizar_lista()
-                self.limpiar_campos()
+        exito, mensaje = self.controlador.editar_empleado(empleado)
+        if exito:
+            messagebox.showinfo("Éxito", mensaje)
+            self.actualizar_lista()
+            self.limpiar_campos()
+        else:
+            messagebox.showerror("Error", mensaje)
 
+    def eliminar_empleado(self):
+        if not self.empleado_seleccionado:
+            messagebox.showerror("Error","Debe seleccionar un empleado")
+            return
+        
+        if not hasattr(self, 'empleado_seleccionado'):
+            messagebox.showerror("Error","Debe seleccionar un empleado")
+            return
+        
+        exito, mensaje = self.controlador.eliminar_empleado(self.empleado_seleccionado.id)
+        if exito:
+            messagebox.showinfo("Éxito", mensaje)
+            self.actualizar_lista()
+            self.limpiar_campos()
+        else:
+            messagebox.showerror("Error", mensaje)
+            
     def limpiar_campos(self):
 
         self.empleado_seleccionado = None
@@ -205,6 +231,8 @@ class VistaEmpleado(tk.Frame):
         self.nombre_entry.delete(0, tk.END)
         self.correo_entry.delete(0, tk.END)
         self.telefono_entry.delete(0, tk.END)
+        self.buscar_entry.delete(0, tk.END)
+        self.buscar_var.set("")
         self.apellido_entry.focus()
 
         self.estado_check.config(state=tk.DISABLED)

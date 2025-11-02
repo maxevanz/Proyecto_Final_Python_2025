@@ -1,5 +1,3 @@
-from .conexion import obtener_conexion
-
 class UsuarioModelo:
 
     def __init__(self, id = None, nombreusuario="", contraseña="", rol="", estado = True, id_empleado=None):

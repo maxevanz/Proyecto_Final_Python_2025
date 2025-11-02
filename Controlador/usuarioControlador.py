@@ -103,6 +103,11 @@ class UsuarioControlador:
             return False, "El nombre de usuario o empleado ya está asignado a otro usuario."
         except mysql.connector.Error as e:
             return False, f"Error al editar el usuario: ",e
+        finally:
+            if conn:
+                conn.close()
+            if cursor:
+                cursor.close()
         
     def activar_desactivar_usuario(self, usuario_id):
         try:
@@ -123,20 +128,6 @@ class UsuarioControlador:
             conn.commit()
 
             return True, "El usuario se Activó/Desactivó correctamente."
-        
-            # # Obtener estado actual
-            #   cursor.execute("SELECT estado FROM empleado WHERE id = %s", (id, ))
-            #   fila = cursor.fetchone()
-
-            #   if fila is None:
-            #        raise ValueError("Empleado no encontrado")
-              
-            #   estado_actual = fila[0]
-            #   nuevo_estado = not estado_actual   #Invertir el booleano
-
-            #   #Actualizar el estado
-            #   cursor.execute("UPDATE empleado SET estado= %s WHERE id=%s", (nuevo_estado, id))
-            #   conn.commit()
 
         except mysql.connector.Error as e:
             return False, f"Error al desactivar el usuario: {e}"

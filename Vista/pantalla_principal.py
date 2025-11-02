@@ -43,7 +43,7 @@ class PantallaPrincipalFrame(tk.Frame):
         self.menu.add_cascade(label="Cuenta", menu=menu_cuenta)
         
         #Mostrar usuario actual
-        self.menu.add_command(label=f"Usuario: {self.usuario_actual}", state="disabled")
+        self.menu.add_command(label=f"Usuario: {self.usuario_actual} - Rol: {self.rol_actual}", state="disabled")
 
     def mostrar_menu(self):
         self.pack(fill=tk.BOTH, expand=True)
