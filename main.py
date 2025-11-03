@@ -20,10 +20,10 @@ class App(tk.Tk):
         self.login_frame.pack()
         self.config(menu=None)          #oculta el menu al cerrar sesion
 
-    def mostrar_pantalla_principal(self, nombre_usuario, rol):
+    def mostrar_pantalla_principal(self, id_usuario, nombre_usuario, rol):
         self.login_frame.pack_forget()
         self.geometry("800x600")
-        self.pantalla_principal_frame.set_usuario(nombre_usuario, rol)
+        self.pantalla_principal_frame.set_usuario(id_usuario, nombre_usuario, rol)
         self.pantalla_principal_frame.mostrar_menu()
 
 if __name__ == "__main__":

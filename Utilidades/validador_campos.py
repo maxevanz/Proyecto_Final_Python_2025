@@ -3,6 +3,24 @@ import re
 class ValidadorCampos:
 
     @staticmethod
+    def es_evento_valido(tipo):
+        return tipo.lower() in ["ingreso", "egreso", "paqueteria", "visitas", "otros"]
+    
+    @staticmethod
+    def validar_observacion_evento(texto, min_len=10):
+        return texto.strip() != "" and len(texto.strip()) >= min_len
+    
+    @staticmethod
+    def validar_evento(tipo, observ):
+        errores = []
+
+        if not ValidadorCampos.es_evento_valido(tipo):
+            errores.append("Tipo evento invalido.")
+        if not ValidadorCampos.validar_observacion_evento(observ, 10):
+            errores.append("Debe colocar al menos 10 caracteres")
+        return errores
+
+    @staticmethod
     def es_texto_valido(texto, max_len=50):
         return texto.strip() != "" and len(texto.strip()) <= max_len
     
