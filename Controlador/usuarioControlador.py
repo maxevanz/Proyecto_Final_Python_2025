@@ -10,7 +10,7 @@ class UsuarioControlador:
     def __init__(self):
         pass
 
-    def obtener_usuario(nombreusuario, contraseña):
+    def verificar_usuario(nombreusuario, contraseña):
         try:
             conn = obtener_conexion()
             cursor = conn.cursor(dictionary=True)

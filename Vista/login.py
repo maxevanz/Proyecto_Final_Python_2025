@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from Modelo.usuario import UsuarioModelo
 from Controlador.usuarioControlador import UsuarioControlador
 
 class LoginFrame(tk.Frame):
@@ -23,10 +24,11 @@ class LoginFrame(tk.Frame):
         usuario = self.usuario_entry.get()
         contrasena = self.contrasena_entry.get()
 
-        usuario_actual = UsuarioControlador.obtener_usuario(usuario, contrasena)
+        usuario_actual = UsuarioControlador.verificar_usuario(usuario, contrasena)
 
         if usuario_actual:
+
             self.pack_forget()
-            self.mostrar_pantalla_principal(usuario_actual["NombreUsuario"], usuario_actual["Rol"])    # ← pasamos el nombre
+            self.mostrar_pantalla_principal(usuario_actual["id"], usuario_actual["NombreUsuario"], usuario_actual["Rol"])    # ← pasamos el nombre
         else:
             messagebox.showerror("ERROR","Credenciales Incorrectas")
