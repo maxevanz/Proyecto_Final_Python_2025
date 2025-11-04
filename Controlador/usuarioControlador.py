@@ -90,12 +90,18 @@ class UsuarioControlador:
         try:
             conn = obtener_conexion()
             cursor = conn.cursor()
-            # Encriptar la contraseña
-            hashed = bcrypt.hashpw(usuario.contraseña.encode('utf-8'), bcrypt.gensalt())
+
+            # Detectar si la contraseña ya está encriptada (por ejemplo, empieza con $2b$)
+            if usuario.contraseña.startswith("$2b$"):
+                hashed = usuario.contraseña  # ya encriptada
+            else:
+                # Encriptar la contraseña
+                hashed = bcrypt.hashpw(usuario.contraseña.encode('utf-8'), bcrypt.gensalt())
 
             consulta_sql = "UPDATE Usuario SET " \
                            "Contraseña = %s, Rol = %s WHERE id = %s"
             valores = (hashed, usuario.rol, usuario.id)
+            
             cursor.execute(consulta_sql, valores)
             conn.commit()
             return True, "Usuario actualizado correctamente"

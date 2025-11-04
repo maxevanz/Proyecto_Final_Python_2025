@@ -37,9 +37,17 @@ class PantallaPrincipalFrame(tk.Frame):
         if self.rol_actual == "admin":
             menu_gestion.add_command(label="Empleados", command=self.mostrar_empleados)            
             menu_gestion.add_command(label="Usuarios", command=self.mostrar_usuarios)
-
-        menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
+            menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
+        elif self.rol_actual == "usuario":
+            menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
+        elif self.rol_actual == "propietario":
+            menu_gestion.add_command(label="Expensas", command="")
+            menu_gestion.add_command(label="Reclamos", command="")
+            menu_gestion.add_command(label="Novedades", command="")
+            
         self.menu.add_cascade(label="Gestión", menu=menu_gestion)
+
+        
 
         #Menu de "Cuenta"
         menu_cuenta = Menu(self.menu, tearoff=0)
@@ -63,7 +71,7 @@ class PantallaPrincipalFrame(tk.Frame):
 
     def mostrar_usuarios(self):
         self.limpiar_contenido()
-        vista = VistaUsuario(self.contenido)
+        vista = VistaUsuario(self.contenido, self.id_usuario_actual)
         vista.pack(fill=tk.BOTH, expand=True)
     
     def mostrar_eventos(self):

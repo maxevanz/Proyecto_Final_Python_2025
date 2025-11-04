@@ -5,9 +5,10 @@ from Modelo.usuario import UsuarioModelo
 from Utilidades.validador_campos import ValidadorCampos
 
 class VistaUsuario(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master=None, usuario_Actual=None):
         super().__init__(master)
         self.controlador = UsuarioControlador()
+        self.usuario_actual = usuario_Actual
         self.usuario_id = None
 
         self.grid(row=0, column=0, sticky="nsew")              
@@ -34,7 +35,7 @@ class VistaUsuario(tk.Frame):
         self.contraseña_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         tk.Label(self.controles_formulario, text="Rol: ").grid(row=2, column=0, sticky="e")
-        self.rol_combo = ttk.Combobox(self.controles_formulario, width=30, values=["admin", "supervisor", "usuario"], state="readonly")
+        self.rol_combo = ttk.Combobox(self.controles_formulario, width=30, values=["admin", "supervisor", "usuario", "propietario"], state="readonly")
         self.rol_combo.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         self.rol_combo.current(0)
 
@@ -111,6 +112,7 @@ class VistaUsuario(tk.Frame):
         self.empleado_combo.set(valores[4])
         self.empleado_combo.config(state=tk.DISABLED)
 
+
     def cargar_usuarios(self):
         self.contraseñas_por_id = {}  # ← nuevo diccionario
         self.grilla.tag_configure("Inactivo", background="#f2dede")  # rojo claro
@@ -120,15 +122,16 @@ class VistaUsuario(tk.Frame):
         self.usuarios = self.controlador.obtener_usuarios()
         
         for usuario in self.usuarios:
-            # Guardar contraseña por ID
-            self.contraseñas_por_id[usuario[0]] = usuario[2]  # usuario[0] = id, usuario[2] = contraseña
+            if usuario[0] != self.usuario_actual:
+                # Guardar contraseña por ID
+                self.contraseñas_por_id[usuario[0]] = usuario[2]  # usuario[0] = id, usuario[2] = contraseña
 
-            # Insertar solo columnas visibles
-            estado = usuario[4]  # ahora el estado está en la posición 4
-            tag = "Inactivo" if estado == 0 else ""
-            estado_texto = "Activo" if estado == 1 else "Inactivo"
-            valores = (usuario[0], usuario[1], usuario[3], estado_texto, usuario[5])  # omitimos la contraseña
-            self.grilla.insert("", tk.END, values=valores, tags=(tag,))
+                # Insertar solo columnas visibles
+                estado = usuario[4]  # ahora el estado está en la posición 4
+                tag = "Inactivo" if estado == 0 else ""
+                estado_texto = "Activo" if estado == 1 else "Inactivo"
+                valores = (usuario[0], usuario[1], usuario[3], estado_texto, usuario[5])  # omitimos la contraseña
+                self.grilla.insert("", tk.END, values=valores, tags=(tag,))
 
     def buscar_usuario(self, *args):
         texto = self.buscar_var.get().lower()
@@ -206,6 +209,7 @@ class VistaUsuario(tk.Frame):
             contraseña = self.contraseña_entry.get().strip(),
             rol = self.rol_combo.get(),
         )
+        
         exito, mensaje = self.controlador.editar_usuario(usuario)
         if exito:
             messagebox.showinfo("Éxito", mensaje)
