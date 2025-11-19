@@ -97,15 +97,14 @@ class VistaEmpleado(tk.Frame):
         for item in self.grilla.get_children():
             self.grilla.delete(item)
         self.empleados = self.controlador.obtener_todos()
- 
 
-        for e in self.empleados:
-            estado_legible = "Activo" if str(e.estado) == "1" else "Inactivo"
-            tag = "estado0" if str(e.estado) == "0" else ""
+        for empleado in self.empleados:
+            estado_legible = "Activo" if str(empleado.estado) == "1" else "Inactivo"
+            tag = "estado0" if str(empleado.estado) == "0" else ""
             self.grilla.insert(
                 "", 
                 tk.END, 
-                values=(e.id, e.apellido, e.nombre, e.correo, e.telefono, estado_legible),
+                values=(empleado.id, empleado.apellido, empleado.nombre, empleado.correo, empleado.telefono, estado_legible),
                 tags=(tag,))
 
     def seleccionar_empleado(self, event):
@@ -159,8 +158,8 @@ class VistaEmpleado(tk.Frame):
     
     def nuevo_empleado(self):
 
-        apellido = self.nombre_entry.get()
-        nombre = self.apellido_entry.get()
+        apellido = self.apellido_entry.get()
+        nombre = self.nombre_entry.get()
         correo = self.correo_entry.get()
         telefono = self.telefono_entry.get()
         estado = 1
@@ -237,4 +236,4 @@ class VistaEmpleado(tk.Frame):
 
         self.estado_check.config(state=tk.DISABLED)
         self.estado_var.set(False)
-        self.boton_crear.config(state=tk.NORMAL)
+        self.boton_crear.config(state=tk.ACTIVE)

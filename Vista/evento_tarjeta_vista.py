@@ -5,9 +5,12 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from Controlador.eventoControlador import EventoControlador
 
+#from Vista.evento_admin_vista import VistaAdminEvento
+
 class VistaEventoTarjeta(tk.Frame):
-    def __init__(self, master=None, usuario_actual=None):
-        super().__init__(master)
+    def __init__(self, parent, usuario_actual):
+        super().__init__(parent)
+
         self.usuario_actual = usuario_actual
         self.controlador = EventoControlador()
         self.crear_contenedor_tarjetas()
@@ -30,6 +33,12 @@ class VistaEventoTarjeta(tk.Frame):
         scrollbar.pack(side="right", fill="y")
 
         self.cargar_tarjetas()
+
+        self.cambiar_frame = tk.LabelFrame(self, text="Cambiar vista")
+        self.cambiar_frame.pack(padx=10, pady=10)
+
+        self.btn_cambiar_vista = tk.Button(self.cambiar_frame, text="Cambiar Vista", command=self.cambiar_vista)
+        self.btn_cambiar_vista.pack(pady=10)
 
     def cargar_tarjetas(self):
         eventos = self.controlador.obtener_eventos()    #<-lista de objetos Evento
@@ -94,3 +103,13 @@ class VistaEventoTarjeta(tk.Frame):
             else:
                 messagebox.showerror("Error","No se pudo eliminar el evento")
 
+    def cambiar_vista(self):
+        from Vista.evento_admin_vista import VistaAdminEvento
+        
+        #limpiar el contenido actual
+        for vista in self.master.winfo_children():
+            vista.destroy()
+
+        vista_seleccionada = VistaAdminEvento(self.master, self.usuario_actual)
+        vista_seleccionada.pack(fill=tk.BOTH, expand=True)
+        

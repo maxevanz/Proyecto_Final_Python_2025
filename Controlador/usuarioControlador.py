@@ -23,9 +23,13 @@ class UsuarioControlador:
                 #Asegurar que el hash esté en bytes
                 if isinstance(has_guardado, str):
                     has_guardado = has_guardado.encode('utf-8')
-                #Comparar con bcrypt
-                if bcrypt.checkpw(contraseña.encode('utf-8'), has_guardado):
-                    return resultado
+
+                #Validar formato del hash
+                if has_guardado.startswith(b"$2b$") or has_guardado.startswith(b"$2a$"): 
+                    if bcrypt.checkpw(contraseña.encode('utf-8'), has_guardado):
+                        return resultado
+                else:
+                    print("Error: la contraseña almacenada no es un hash valido")
             return None     #credenciales incorrectas
         
         except Exception as e:

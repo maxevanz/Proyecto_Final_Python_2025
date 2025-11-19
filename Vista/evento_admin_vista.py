@@ -4,6 +4,8 @@ from PIL import Image, ImageTk
 from Modelo.evento import EventoModelo
 from Controlador.eventoControlador import EventoControlador
 
+#from Vista.evento_tarjeta_vista import VistaEventoTarjeta
+
 class VistaAdminEvento(tk.Frame):
     def __init__(self, master=None, usuario_actual=None):
         super().__init__(master)
@@ -12,25 +14,28 @@ class VistaAdminEvento(tk.Frame):
         self.image_path = None
         self.crear_layout()
 
+        self.vista_actual = "admin"
+
+
     def crear_layout(self):
         self.columnconfigure(1, weight=1)
 
         #Formulario
-        form_frame = tk.LabelFrame(self, text="Agregar Evento")
-        form_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+        self.form_frame = tk.LabelFrame(self, text="Agregar Evento")
+        self.form_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
 
-        tk.Label(form_frame, text="Tipo de evento:").grid(row=0, column=0, sticky="w")
-        self.tipo_combo = ttk.Combobox(form_frame, values=["ingreso", "egreso", "paqueteria", "visitas", "otros"])
+        tk.Label(self.form_frame, text="Tipo de evento:").grid(row=0, column=0, sticky="w")
+        self.tipo_combo = ttk.Combobox(self.form_frame, values=["ingreso", "egreso", "paqueteria", "visitas", "otros"])
         self.tipo_combo.grid(row=1, column=0, padx=5, pady=5)
 
-        tk.Label(form_frame, text="Observaciones:").grid(row=2, column=0, sticky="w")
-        self.obs_text = tk.Text(form_frame, height=4, width=30)
+        tk.Label(self.form_frame, text="Observaciones:").grid(row=2, column=0, sticky="w")
+        self.obs_text = tk.Text(self.form_frame, height=4, width=30)
         self.obs_text.grid(row=3, column=0, padx=5, pady=5)
 
-        self.btn_imagen = tk.Button(form_frame, text="Seleccionar imagen", command=self.seleccionar_imagen)
+        self.btn_imagen = tk.Button(self.form_frame, text="Seleccionar imagen", command=self.seleccionar_imagen)
         self.btn_imagen.grid(row=4, column=0, pady=5)
 
-        self.btn_agregar = tk.Button(form_frame, text="Agregar evento", command=self.agregar_evento)
+        self.btn_agregar = tk.Button(self.form_frame, text="Agregar evento", command=self.agregar_evento)
         self.btn_agregar.grid(row=5, column=0, pady=10)
 
         # Lista de eventos
@@ -46,10 +51,10 @@ class VistaAdminEvento(tk.Frame):
 
         self.grilla.bind("<Double-1>", self.ver_evento)
 
-        cambiar_frame = tk.LabelFrame(self, text="Cambiar vista")
-        cambiar_frame.grid(row=1, column=0, padx=10, pady=10)
+        self.cambiar_frame = tk.LabelFrame(self, text="Cambiar vista")
+        self.cambiar_frame.grid(row=1, column=0, padx=10, pady=10)
 
-        self.btn_cambiar_vista = tk.Button(cambiar_frame, text="Cambiar Vista", command="")
+        self.btn_cambiar_vista = tk.Button(self.cambiar_frame, text="Cambiar Vista", command=self.cambiar_vista)
         self.btn_cambiar_vista.grid(row=0, column=0, pady=10)
 
         self.cargar_eventos()
@@ -94,6 +99,7 @@ class VistaAdminEvento(tk.Frame):
             self.grilla.insert("","end", iid=evento.id, values=(evento.tipo, evento.fecha, evento.observaciones[:40]))
 
     def ver_evento(self, event):
+
         item_id = self.grilla.focus()
         evento = self.controlador.obtener_evento_por_id(item_id)
         print(f"este es un mensaje: ", evento)
@@ -102,3 +108,26 @@ class VistaAdminEvento(tk.Frame):
             if evento.imagen:
                 detalle += f"\nImagen: {evento.imagen}"
             messagebox.showinfo("Detalle deñ evento", detalle)
+
+    def cambiar_vista(self):
+        from Vista.evento_tarjeta_vista import VistaEventoTarjeta
+        
+        #limpiar el contenido actual
+        for vista in self.master.winfo_children():
+            vista.destroy()
+
+        vista_seleccionada = VistaEventoTarjeta(self.master, self.usuario_actual)
+        vista_seleccionada.pack(fill=tk.BOTH, expand=True)
+        
+        # #alternar entre vistas
+        # if self.vista_actual == "admin":
+        #     vista_seleccionada = VistaEventoTarjeta(self.master, self.usuario_actual)
+        #     self.vista_actual = "tarjeta"
+
+        # else:
+        #     vista_seleccionada = VistaAdminEvento(self.master)
+        #     self.vista_actual = "admin"
+
+        # vista_seleccionada.pack(fill=tk.BOTH, expand=True)
+
+

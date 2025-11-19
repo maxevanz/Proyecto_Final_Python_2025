@@ -3,7 +3,7 @@ from tkinter import Menu
 from Vista.empleado_vista import VistaEmpleado
 from Vista.usuario_vista import VistaUsuario
 #from Vista.evento_vista import VistaEvento
-from  Vista.evento_tarjeta_vista import VistaEventoTarjeta
+from Vista.evento_tarjeta_vista import VistaEventoTarjeta
 from Vista.evento_admin_vista import VistaAdminEvento
 
 class PantallaPrincipalFrame(tk.Frame):
