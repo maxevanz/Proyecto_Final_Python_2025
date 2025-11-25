@@ -33,6 +33,10 @@ class ValidadorCampos:
         return texto == "" or (texto.isdigit() and len(texto) <= longitud)
 
     @staticmethod
+    def validar_dni(texto, longitud=8):    
+        return texto == "" or (texto.isdigit() and len(texto) <= longitud)
+
+    @staticmethod
     def tiene_longitud_minima(texto, min_len=4):
         return len(texto.strip()) >= min_len
     

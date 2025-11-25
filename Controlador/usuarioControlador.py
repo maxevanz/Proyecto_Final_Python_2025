@@ -49,10 +49,13 @@ class UsuarioControlador:
                            "u.NombreUsuario, " \
                            "u.Contraseña, " \
                            "u.Rol, " \
-                           "u.Estado," \
-                           "CONCAT(e.apellido, ', ', e.nombre) " \
-                           "FROM Usuario u " \
-                           "JOIN Empleado e ON u.id_empleado = e.id"
+                           "u.Estado, " \
+                           "COALESCE(CONCAT(e.Apellido, ', ', e.Nombre), " \
+                           "CONCAT(p.Apellido, ', ', p.Nombre)) AS NombreAsociado " \
+                           "FROM " \
+                           "Usuario u " \
+                           "LEFT JOIN Empleado e ON u.id_empleado = e.id " \
+                           "LEFT JOIN Propietario p ON u.id_propietario = p.id "
             cursor.execute(consulta_sql)
             usuarios = cursor.fetchall()
             return usuarios
@@ -73,23 +76,67 @@ class UsuarioControlador:
             # Encriptar la contraseña
             hashed = bcrypt.hashpw(usuario.contraseña.encode('utf-8'), bcrypt.gensalt())
 
-            consulta_sql = "INSERT INTO Usuario(NombreUsuario, Contraseña, Rol, Estado, id_empleado)" \
-                           "VALUES(%s, %s, %s, %s, %s)"
-            valores = (usuario.nombreusuario, hashed, usuario.rol, usuario.estado, usuario.id_empleado)
+            consulta_sql = "INSERT INTO Usuario(NombreUsuario, Contraseña, Rol, Estado)" \
+                           "VALUES(%s, %s, %s, %s)"
+            valores = (usuario.nombreusuario, hashed, usuario.rol, usuario.estado)
             cursor.execute(consulta_sql, valores)
             conn.commit()
-            return True, "Usuario creado correctamente"
-        
-        except mysql.connector.IntegrityError as e:
-            return False, "Ya existe un usuario con ese nombre o ese empleado ya está asignado"
+            id_creado = cursor.lastrowid
+
+            return id_creado    #devuelve el id del nuevo usuario
+
         except mysql.connector.Error as e:
-            return False, f"Error al crear el usuario: {e}"
+            print(f"Error al crear el usuario: {e}")
         finally:
             if cursor:
                 cursor.close()
             if conn:
                 conn.close()
         
+    def vincular_empleado(self, id_empleado, id_usuario):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            
+            consulta_sql = "UPDATE Usuario SET id_empleado =%s WHERE id = %s"
+            valores = (id_empleado, id_usuario)
+            cursor.execute(consulta_sql, valores)
+            conn.commit()
+
+            return True, "Usuario creado y vinculado"
+        
+        except mysql.connector.IntegrityError as e:
+            return False, "El nombre de usuario o empleado ya está asignado a otro usuario."
+        except mysql.connector.Error as e:
+            return False, f"Error al vincular usuario con empleado: ",e
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+    def vincular_propietario(self, id_propietario, id_usuario):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            
+            consulta_sql = "UPDATE Usuario SET id_propietario =%s WHERE id = %s"
+            valores = (id_propietario, id_usuario)
+            cursor.execute(consulta_sql, valores)
+            conn.commit()
+
+            return True, "Usuario creado y vinculado"
+        
+        except mysql.connector.IntegrityError as e:
+            return False, "El nombre de usuario o propietario ya está asignado a otro usuario."
+        except mysql.connector.Error as e:
+            return False, f"Error al vincular usuario con propietario: ",e
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
     def editar_usuario(self, usuario : UsuarioModelo):
         try:
             conn = obtener_conexion()
@@ -169,3 +216,87 @@ class UsuarioControlador:
             if conn:
                 conn.close()
 
+    def obtener_propietarios_disponibles(self):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            consulta_sql = "SELECT p.id, p.apellido, p.nombre " \
+                           "FROM Prpietario p " \
+                           "LEFT JOIN Usuario u ON e.id = p.id_propietario " \
+                           "WHERE u.id_propietario IS NULL AND e.estado = 1"
+            
+            cursor.execute(consulta_sql)
+            propietarios = cursor.fetchall()
+            return propietarios
+        
+        except mysql.connector.Error as e:
+            print("Error al obtener propietarios disponibles: ",e)
+            return []
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+
+    #####FUNCIONES PARA FILTRAR USUARIOS POR ROL########
+    def obtener_empleados(self):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            consulta_sql = "SELECT e.id, CONCAT(e.Apellido, ' ', e.Nombre) " \
+                           "FROM Empleado e " \
+                           "LEFT JOIN Usuario u ON e.id = u.id_empleado " \
+                           "WHERE u.id_empleado IS NULL AND e.estado = 1"
+            cursor.execute(consulta_sql)
+            empleados = cursor.fetchall()
+            return empleados
+        
+        except mysql.connector.Error as e:
+            print("Error al obtener empleados: ", e)
+            return []
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+    def obtener_propietarios(self):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            consulta_sql = "SELECT p.id, CONCAT(p.Apellido, ' ', p.Nombre) " \
+                           "FROM Propietario p " \
+                           "LEFT JOIN Usuario u ON p.id = u.id_propietario " \
+                           "WHERE u.id_propietario IS NULL AND p.estado = 1"
+            cursor.execute(consulta_sql)
+            propietarios = cursor.fetchall()
+            return propietarios
+        
+        except mysql.connector.Error as e:
+            print("Error al obtener propietarios: ", e)
+            return []
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+    def obtener_entidades_por_rol(self, rol):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+            
+            if rol == "propietario":
+                return self.obtener_propietarios()
+            else:
+                return self.obtener_empleados()
+        
+        except mysql.connector.Error as e:
+            print("Error al obtener propietarios: ", e)
+            return []
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()

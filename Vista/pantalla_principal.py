@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import Menu
 from Vista.empleado_vista import VistaEmpleado
 from Vista.usuario_vista import VistaUsuario
+from Vista.propietario_vista import VistaPropietario
 #from Vista.evento_vista import VistaEvento
 from Vista.evento_tarjeta_vista import VistaEventoTarjeta
 from Vista.evento_admin_vista import VistaAdminEvento
@@ -37,17 +38,16 @@ class PantallaPrincipalFrame(tk.Frame):
         if self.rol_actual == "admin":
             menu_gestion.add_command(label="Empleados", command=self.mostrar_empleados)            
             menu_gestion.add_command(label="Usuarios", command=self.mostrar_usuarios)
+            menu_gestion.add_command(label="Propietarios", command=self.mostrar_propietarios)
             menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
         elif self.rol_actual == "usuario":
             menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
         elif self.rol_actual == "propietario":
-            menu_gestion.add_command(label="Expensas", command="")
             menu_gestion.add_command(label="Reclamos", command="")
             menu_gestion.add_command(label="Novedades", command="")
             
         self.menu.add_cascade(label="Gestión", menu=menu_gestion)
 
-        
 
         #Menu de "Cuenta"
         menu_cuenta = Menu(self.menu, tearoff=0)
@@ -67,6 +67,11 @@ class PantallaPrincipalFrame(tk.Frame):
     def mostrar_empleados(self):
         self.limpiar_contenido()
         vista = VistaEmpleado(self.contenido)
+        vista.pack(fill=tk.BOTH, expand=True)
+
+    def mostrar_propietarios(self):
+        self.limpiar_contenido()
+        vista = VistaPropietario(self.contenido)
         vista.pack(fill=tk.BOTH, expand=True)
 
     def mostrar_usuarios(self):

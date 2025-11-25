@@ -37,17 +37,19 @@ class VistaUsuario(tk.Frame):
         tk.Label(self.controles_formulario, text="Rol: ").grid(row=2, column=0, sticky="e")
         self.rol_combo = ttk.Combobox(self.controles_formulario, width=30, values=["admin", "supervisor", "usuario", "propietario"], state="readonly")
         self.rol_combo.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
-        self.rol_combo.current(0)
+        self.rol_combo.current(0)        
 
-        tk.Label(self.controles_formulario, text="Estado: ").grid(row=3, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Nombre: ").grid(row=3, column=0, sticky="e")
+        self.entidad_combo = ttk.Combobox(self.controles_formulario, width=30, state="readonly")
+        self.entidad_combo.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
+        #self.cargar_empleados_disponibles()
+        # Vincular evento al cambio de rol
+        self.rol_combo.bind("<<ComboboxSelected>>", self.actualizar_entidades)
+
+        tk.Label(self.controles_formulario, text="Estado: ").grid(row=4, column=0, sticky="e")
         self.estado_var = tk.BooleanVar(value=True)
         self.estado_check = tk.Checkbutton(self.controles_formulario, variable=self.estado_var, state=tk.DISABLED)
-        self.estado_check.grid(row=3, column=1, padx=5)
-
-        tk.Label(self.controles_formulario, text="Empleado: ").grid(row=4, column=0, sticky="e")
-        self.empleado_combo = ttk.Combobox(self.controles_formulario, width=30, state="readonly")
-        self.empleado_combo.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
-        self.cargar_empleados_disponibles()
+        self.estado_check.grid(row=4, column=1, padx=5)
 
         ####SECCION BOTONES####
 
@@ -78,7 +80,7 @@ class VistaUsuario(tk.Frame):
         self.buscar_var.trace_add("write", self.buscar_usuario)
 
     def mostrar_grilla(self):       
-        columnas = ("Id", "Usuario", "Rol", "Estado", "Empleado")
+        columnas = ("Id", "Usuario", "Rol", "Estado", "Nombre")
         self.grilla = ttk.Treeview(self, columns=columnas, show="headings")
         self.grilla.grid(row=1, column=0, columnspan=2, padx=11, pady=10, sticky="nsew")
         self.columnconfigure(0, weight=1)
@@ -108,10 +110,15 @@ class VistaUsuario(tk.Frame):
         self.contraseña_entry.delete(0, tk.END)
         self.contraseña_entry.insert(0, self.contraseñas_por_id.get(int(valores[0]), ""))
         self.rol_combo.set(valores[2])
+        # validar y deshabilitar/activar el combo entidad
+        if valores[2] == "propietario":
+            self.rol_combo.config(state="disabled")
+        else:
+            self.rol_combo.config(state="readonly")
+        
         self.estado_var.set(str(valores[3]) == "Activo")
-        self.empleado_combo.set(valores[4])
-        self.empleado_combo.config(state=tk.DISABLED)
-
+        self.entidad_combo.set(valores[4])
+        self.entidad_combo.config(state=tk.DISABLED)
 
     def cargar_usuarios(self):
         self.contraseñas_por_id = {}  # ← nuevo diccionario
@@ -130,6 +137,7 @@ class VistaUsuario(tk.Frame):
                 estado = usuario[4]  # ahora el estado está en la posición 4
                 tag = "Inactivo" if estado == 0 else ""
                 estado_texto = "Activo" if estado == 1 else "Inactivo"
+                
                 valores = (usuario[0], usuario[1], usuario[3], estado_texto, usuario[5])  # omitimos la contraseña
                 self.grilla.insert("", tk.END, values=valores, tags=(tag,))
 
@@ -165,38 +173,84 @@ class VistaUsuario(tk.Frame):
             opciones.append(etiqueta)
             self.empleado_map[etiqueta] = emp_id
 
-        self.empleado_combo["values"] = opciones
+        self.entidad_combo["values"] = opciones
         if opciones:
-            self.empleado_combo.current(0)
+            self.entidad_combo.current(0)
+
+    def cargar_propietarios_disponibles(self):
+        propietarios = self.controlador.obtener_propietarios_disponibles()
+        self.propietario_map = {}      #Mapea "Apellido, Nombre" -> id
+        opciones = []
+
+        for prop_id, apellido, nombre in propietarios:
+            etiqueta = f"{apellido}, {nombre}"
+            opciones.append(etiqueta)
+            self.propietario_map[etiqueta] = prop_id
+
+        self.entidad_combo["values"] = opciones
+        if opciones:
+            self.entidad_combo.current(0)
 
     def crear_usuario(self):
         nombreusuario = self.nombre_usuario_entry.get().strip()
         contraseña = self.contraseña_entry.get().strip()
         rol = self.rol_combo.get()
         estado = self.estado_var.get()
-        empleado_etiqueta = self.empleado_combo.get()
+        entidad_etiqueta = self.entidad_combo.get()
 
         #validacion
-        if not nombreusuario or not contraseña or not empleado_etiqueta:
+        if not nombreusuario or not contraseña or not entidad_etiqueta:
             messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
-        id_empleado = self.empleado_map.get(empleado_etiqueta)
+        
         usuario = UsuarioModelo(
             nombreusuario = nombreusuario,
             contraseña = contraseña,
             rol = rol,
-            estado = estado,
-            id_empleado = id_empleado
+            estado = estado
         )
+        
+        id_usuario = self.controlador.crear_usuario(usuario)
 
-        exito, mensaje = self.controlador.crear_usuario(usuario)
+        if id_usuario == None:
+            messagebox.showerror("Error", "El nombre de usuario o empleado ya está asignado a otro usuario")
+            return
+        
+        seleccion = self.entidad_combo.get()
+        if seleccion:
+            id_entidad = self.mapa_entidades[seleccion]
+
+            if rol == "propietario":
+                exito, mensaje = self.controlador.vincular_propietario(id_entidad, id_usuario)
+                
+            else:
+                exito, mensaje = self.controlador.vincular_empleado(id_entidad, id_usuario)
+
         if exito:
             messagebox.showinfo("Éxito", mensaje)
             self.limpiar_formulario()
-            self.cargar_empleados_disponibles()
             self.cargar_usuarios()
         else:
             messagebox.showerror("Error", mensaje)
+
+        
+        # id_empleado = self.empleado_map.get(entidad_etiqueta)
+        # usuario = UsuarioModelo(
+        #     nombreusuario = nombreusuario,
+        #     contraseña = contraseña,
+        #     rol = rol,
+        #     estado = estado,
+        #     id_empleado = id_empleado
+        # )
+
+        # exito, mensaje = self.controlador.crear_usuario(usuario)
+        # if exito:
+        #     messagebox.showinfo("Éxito", mensaje)
+        #     self.limpiar_formulario()
+        #     self.cargar_empleados_disponibles()
+        #     self.cargar_usuarios()
+        # else:
+        #     messagebox.showerror("Error", mensaje)
 
     def editar_usuario(self):
         if not self.usuario_id:
@@ -238,18 +292,40 @@ class VistaUsuario(tk.Frame):
             messagebox.showerror("Error", mensaje)
 
     def limpiar_formulario(self):
+
         self.boton_crear.config(state=tk.NORMAL)
         self.nombre_usuario_entry.config(state=tk.NORMAL)
-        self.empleado_combo.config(state=tk.NORMAL)
+        self.entidad_combo.config(state=tk.NORMAL)
 
         self.usuario_id = None
         self.nombre_usuario_entry.delete(0, tk.END)
         self.contraseña_entry.delete(0, tk.END)
         self.rol_combo.current(0)
         self.estado_var.set(True)
-        self.empleado_combo.set("")
+        self.entidad_combo.set("")
         self.buscar_entry.delete(0, tk.END)
         self.buscar_var.set("")
 
         self.nombre_usuario_entry.focus()
         
+##funcion para filtrar por tipo de usuario
+    def actualizar_entidades(self, event=None):
+        rol_seleccionado = self.rol_combo.get()
+        
+        if rol_seleccionado == "propietario":
+            resultados = self.controlador.obtener_propietarios()
+            # opciones = [fila[1] for fila in resultados]
+            # self.mapa_entidades = {fila[1]: fila[0] for fila in resultados}
+            # self.entidad_combo['values'] = opciones
+        else:
+            resultados = self.controlador.obtener_empleados()
+            # opciones = [fila[1] for fila in resultados]
+            # self.mapa_entidades = {fila[1]: fila[0] for fila in resultados}
+            # self.entidad_combo['values'] = opciones
+
+        # armar lista para el combo y diccionario paralelo
+        opciones = [fila[1] for fila in resultados]
+        self.mapa_entidades = {fila[1]: fila[0] for fila in resultados}
+    
+        self.entidad_combo['values'] = opciones
+        self.entidad_combo.set("")
