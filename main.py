@@ -12,6 +12,7 @@ class App(tk.Tk):
         self.pantalla_principal_frame = PantallaPrincipalFrame(self, self.mostrar_login)
 
         self.geometry("300x500")
+        
         self.login_frame.pack()
 
     def mostrar_login(self):

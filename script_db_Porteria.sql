@@ -149,19 +149,21 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `porteria`.`eventos`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `porteria`.`eventos` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `tipo` ENUM('ingreso', 'egreso', 'paqueteria', 'visitas', 'otros') NOT NULL,
-  `fecha` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `observaciones` VARCHAR(500) NULL DEFAULT NULL,
-  `imagen` VARCHAR(255) NULL DEFAULT NULL,
-  `id_usuario` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `id_usuario` (`id_usuario` ASC) VISIBLE,
-  INDEX `fecha` (`fecha` ASC) VISIBLE,
-  CONSTRAINT `eventos_ibfk_1`
-    FOREIGN KEY (`id_usuario`)
-    REFERENCES `porteria`.`usuario` (`id`))
+CREATE TABLE IF NOT EXISTS eventos (
+  id INT NOT NULL AUTO_INCREMENT,
+  tipo ENUM('ingreso', 'egreso', 'paqueteria', 'visitas', 'otros') NOT NULL,
+  fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  observaciones VARCHAR(500) NULL DEFAULT NULL,
+  imagen VARCHAR(255) NULL DEFAULT NULL,
+  id_usuario INT NOT NULL,
+  id_propietario INT NULL,
+  PRIMARY KEY (id),
+  INDEX id_usuario (id_usuario ASC),
+  INDEX fecha (fecha ASC),
+  INDEX id_propietario (id_propietario ASC),
+  FOREIGN KEY (id_usuario) REFERENCES usuario (id),
+  FOREIGN KEY (id_propietario) REFERENCES propietario (id)
+)
 ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
