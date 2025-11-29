@@ -56,6 +56,11 @@ class VistaEventoTarjeta(tk.Frame):
         #Observaciones
         tk.Label(tarjeta, text=evento.observaciones, font=("Arial",10), wraplength=500, justify="left").pack(anchor="w", pady=5)
 
+        #Botones
+        btn_frame = tk.Frame(tarjeta)
+        btn_frame.pack(anchor="w", pady=5)
+        btn_ver_imagen = tk.Button(btn_frame, text="Ver imagen", command=lambda: self.ver_imagen(evento))
+        btn_ver_imagen.pack(side="left", padx=2)
         #Imagen miniatura
         if evento.imagen:
             try:
@@ -67,41 +72,33 @@ class VistaEventoTarjeta(tk.Frame):
                 img_label.pack(anchor="w", pady=5)
 
             except Exception as e:
-                tk.Label(tarjeta, text="Error al cargar imagen", fg="red").pack(anchor="w")
+                tk.Label(tarjeta, text="Error al cargar la imagen", fg="red").pack(anchor="w")
+                btn_ver_imagen.config(state=tk.DISABLED)
+        else:
+            # Si no hay imagen, también deshabilitar
+            btn_ver_imagen.config(state=tk.DISABLED)
+                
 
-        #Botones
-        btn_frame = tk.Frame(tarjeta)
-        btn_frame.pack(anchor="w", pady=5)
         
-        tk.Button(btn_frame, text="Ver imagen", command=lambda: self.ver_imagen(evento)).pack(side="left", padx=2)
-        tk.Button(btn_frame, text="Editar", command=lambda: self.editar_evento(evento)).pack(side="left", padx=2)
-        tk.Button(btn_frame, text="Eliminar", command=lambda: self.eliminar_evento(evento)).pack(side="left", padx=2)
 
+        #tk.Button(btn_frame, text="Ver imagen", command=lambda: self.ver_imagen(evento)).pack(side="left", padx=2)
+        
+        
 
     def ver_imagen(self, evento):
         if evento.imagen:
             top = tk.Toplevel(self)
             top.title("Imagen del evento")
             img = Image.open(evento.imagen)
+            img.thumbnail((700, 600))
             img_tk = ImageTk.PhotoImage(img)
             tk.Label(top, image=img_tk).pack()
             top.image = img_tk      #mantener referencia
+
+            # Centrar ventana de detalle con tamaño fijo
+            centrar_ventana(top, 500, 400)  # centrar la ventana de detalle
         else:
             messagebox.showinfo("Sin imagen","Este evento no tiene imagen asociada")
-
-    def editar_evento(self, evento):
-        messagebox.showinfo("Editar",f"Editar evento ID {evento.id}")
-
-    def eliminar_evento(self, evento):
-        confirm = messagebox.askyesno("Eliminar",f"¿Eliminar evento ID {evento.id}?")
-        if confirm:
-            if self.controlador.eliminar_evento(evento.id):
-                messagebox.showinfo("Eliminado","Evento eliminado correctamente")
-                for widget in self.tarjeta_frame.winfo_children():
-                    widget.destroy()
-                self.cargar_tarjetas()
-            else:
-                messagebox.showerror("Error","No se pudo eliminar el evento")
 
     def cambiar_vista(self):
         from Vista.evento_admin_vista import VistaAdminEvento
@@ -112,4 +109,11 @@ class VistaEventoTarjeta(tk.Frame):
 
         vista_seleccionada = VistaAdminEvento(self.master, self.usuario_actual)
         vista_seleccionada.pack(fill=tk.BOTH, expand=True)
-        
+
+def centrar_ventana(ventana, ancho, alto):
+    screen_width = ventana.winfo_screenwidth()
+    screen_height = ventana.winfo_screenheight()
+    x = (screen_width // 2) - (ancho // 2)
+    y = (screen_height // 2) - (alto // 2)
+
+    ventana.geometry(f"{ancho}x{alto}+{x}+{y}")

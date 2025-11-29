@@ -42,7 +42,7 @@ class VistaUsuario(tk.Frame):
         tk.Label(self.controles_formulario, text="Nombre: ").grid(row=3, column=0, sticky="e")
         self.entidad_combo = ttk.Combobox(self.controles_formulario, width=30, state="readonly")
         self.entidad_combo.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
-        #self.cargar_empleados_disponibles()
+        
         # Vincular evento al cambio de rol
         self.rol_combo.bind("<<ComboboxSelected>>", self.actualizar_entidades)
 
@@ -232,25 +232,6 @@ class VistaUsuario(tk.Frame):
             self.cargar_usuarios()
         else:
             messagebox.showerror("Error", mensaje)
-
-        
-        # id_empleado = self.empleado_map.get(entidad_etiqueta)
-        # usuario = UsuarioModelo(
-        #     nombreusuario = nombreusuario,
-        #     contraseña = contraseña,
-        #     rol = rol,
-        #     estado = estado,
-        #     id_empleado = id_empleado
-        # )
-
-        # exito, mensaje = self.controlador.crear_usuario(usuario)
-        # if exito:
-        #     messagebox.showinfo("Éxito", mensaje)
-        #     self.limpiar_formulario()
-        #     self.cargar_empleados_disponibles()
-        #     self.cargar_usuarios()
-        # else:
-        #     messagebox.showerror("Error", mensaje)
 
     def editar_usuario(self):
         if not self.usuario_id:

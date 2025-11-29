@@ -80,13 +80,6 @@ class PantallaPrincipalFrame(tk.Frame):
         vista.pack(fill=tk.BOTH, expand=True)
     
     def mostrar_eventos(self):
-        # self.limpiar_contenido()
-        # vista = VistaEvento(self.contenido, id_usuario = self.id_usuario_actual)
-        # vista.pack(fill=tk.BOTH, expand=True)
-
-        # self.limpiar_contenido()
-        # vista = VistaEventoTarjeta(self.contenido, self.id_usuario_actual)
-        # vista.pack(fill=tk.BOTH, expand=True)
 
         self.limpiar_contenido()
         vista = VistaAdminEvento(self.contenido, self.id_usuario_actual)

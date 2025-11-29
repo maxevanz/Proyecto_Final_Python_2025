@@ -56,7 +56,7 @@ class EventoControlador:
             consulta_sql = "SELECT e.id, e.tipo, e.fecha, e.observaciones, e.imagen, " \
                            "e.id_usuario, " \
                            "e.id_propietario, " \
-                           "CONCAT(p.Apellido, ' ', p.Nombre) AS NombrePropietario " \
+                           "CONCAT(p.Apellido, ', ', p.Nombre) AS NombrePropietario " \
                            "FROM Eventos e " \
                            "JOIN Usuario u ON e.id_usuario = u.id " \
                            "JOIN Propietario p ON e.id_propietario = p.id " \
@@ -115,6 +115,34 @@ class EventoControlador:
                 cursor.close()
             if conn:
                 conn.close()
+
+    def editar_evento(self, evento : EventoModelo):
+        try:
+            conn = obtener_conexion()
+            cursor = conn.cursor()
+
+            consulta_sql = "UPDATE Eventos SET tipo=%s, observaciones=%s, imagen=%s, id_usuario=%s, id_propietario=%s " \
+                           "WHERE id=%s"
+            valores = (
+                evento.tipo, 
+                evento.observaciones, 
+                evento.imagen, 
+                evento.id_usuario,
+                evento.id_propietario,
+                evento.id)
+            
+            cursor.execute(consulta_sql, valores)
+            conn.commit()
+            return True, "Evento actualizado correctamente"
+        
+        except mysql.connector.Error as e:
+            return False, f"Error al editar el evento: {e}"
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
 
     def obtener_propietarios(self):
         try:
