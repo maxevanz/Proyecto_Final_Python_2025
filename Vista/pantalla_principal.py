@@ -6,6 +6,7 @@ from Vista.propietario_vista import VistaPropietario
 #from Vista.evento_vista import VistaEvento
 from Vista.evento_tarjeta_vista import VistaEventoTarjeta
 from Vista.evento_admin_vista import VistaAdminEvento
+from Vista.reclamos_vista import VistaReclamos
 
 class PantallaPrincipalFrame(tk.Frame):
     def __init__(self, master, mostrar_login):
@@ -40,10 +41,11 @@ class PantallaPrincipalFrame(tk.Frame):
             menu_gestion.add_command(label="Usuarios", command=self.mostrar_usuarios)
             menu_gestion.add_command(label="Propietarios", command=self.mostrar_propietarios)
             menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
+            menu_gestion.add_command(label="Reclamos", command=self.mostrar_reclamos)
         elif self.rol_actual == "usuario":
             menu_gestion.add_command(label="Eventos", command=self.mostrar_eventos)
         elif self.rol_actual == "propietario":
-            menu_gestion.add_command(label="Reclamos", command="")
+            menu_gestion.add_command(label="Reclamos", command=self.mostrar_reclamos)
             menu_gestion.add_command(label="Novedades", command="")
             
         self.menu.add_cascade(label="Gestión", menu=menu_gestion)
@@ -83,6 +85,11 @@ class PantallaPrincipalFrame(tk.Frame):
 
         self.limpiar_contenido()
         vista = VistaAdminEvento(self.contenido, self.id_usuario_actual)
+        vista.pack(fill=tk.BOTH, expand=True)
+
+    def mostrar_reclamos(self):
+        self.limpiar_contenido()
+        vista = VistaReclamos(self.contenido, self.id_usuario_actual)
         vista.pack(fill=tk.BOTH, expand=True)
 
     def limpiar_contenido(self):

@@ -73,7 +73,6 @@ class VistaAdminEvento(tk.Frame):
         self.grilla.bind("<Double-1>", self.ver_evento)
         self.cargar_eventos()
 
-
     def seleccionar_imagen(self):
         ruta = filedialog.askopenfilename(filetypes=[("Imágenes","*.jpg *.png *.jpeg")])
         
@@ -85,9 +84,6 @@ class VistaAdminEvento(tk.Frame):
             # Guardar ruta si la necesitás
             self.ruta_imagen = ruta
             messagebox.showinfo("Imagen seleccionada", ruta)
-        else:
-            self.ruta_imagen = ""
-            messagebox.showinfo("Sin imagen asociada", ruta )
 
     def seleccionar_evento(self, event):
         seleccion = self.grilla.focus()        
@@ -103,6 +99,7 @@ class VistaAdminEvento(tk.Frame):
             self.obs_text.insert("1.0", self.evento_seleccionado.observaciones)
             # Mostrar la ruta de la imagen en el Label
             if self.evento_seleccionado.imagen:
+                self.lbl_imagen.config(text="")
                 self.lbl_imagen.config(text=f"{self.evento_seleccionado.imagen}")
             else:
                 self.lbl_imagen.config(text="Sin imagen asociada")
@@ -155,6 +152,7 @@ class VistaAdminEvento(tk.Frame):
         
         propietario = self.propietario_combo.get()
         id_propietario = self.mapa_propietarios[propietario]
+        imagen = self.lbl_imagen.cget("text")
 
         if id_propietario is None:
             messagebox.showerror("Error", f"Propietario '{propietario}' no encontrado en el mapa")
@@ -164,7 +162,7 @@ class VistaAdminEvento(tk.Frame):
             id=self.evento_seleccionado.id,
             tipo=self.tipo_combo.get(),
             observaciones=self.obs_text.get("1.0", "end-1c"),  # obtiene el contenido del Text
-            imagen=self.ruta_imagen,
+            imagen=imagen,
             id_usuario=self.usuario_actual,
             id_propietario=id_propietario
         )
@@ -265,7 +263,7 @@ class VistaAdminEvento(tk.Frame):
         self.tipo_combo.set("")
         self.propietario_combo.set("")
         self.obs_text.delete("1.0", "end")
-        self.lbl_imagen.config(text="Sin imagen asociada")
+        self.lbl_imagen.config(text="Ninguna imagen seleccionada")
 
         self.obs_text.focus()
 

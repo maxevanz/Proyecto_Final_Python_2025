@@ -123,7 +123,7 @@ class EventoControlador:
 
             consulta_sql = "UPDATE Eventos SET tipo=%s, observaciones=%s, imagen=%s, id_usuario=%s, id_propietario=%s " \
                            "WHERE id=%s"
-            valores = (
+            valores = (                
                 evento.tipo, 
                 evento.observaciones, 
                 evento.imagen, 
