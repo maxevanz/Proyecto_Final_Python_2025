@@ -83,8 +83,6 @@ class VistaEventoTarjeta(tk.Frame):
 
         #tk.Button(btn_frame, text="Ver imagen", command=lambda: self.ver_imagen(evento)).pack(side="left", padx=2)
         
-        
-
     def ver_imagen(self, evento):
         if evento.imagen:
             top = tk.Toplevel(self)
@@ -101,7 +99,7 @@ class VistaEventoTarjeta(tk.Frame):
             messagebox.showinfo("Sin imagen","Este evento no tiene imagen asociada")
 
     def cambiar_vista(self):
-        from Vista.evento_admin_vista import VistaAdminEvento
+        from Vista.Eventos.evento_admin_vista import VistaAdminEvento
         
         #limpiar el contenido actual
         for vista in self.master.winfo_children():

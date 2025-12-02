@@ -22,7 +22,7 @@ class App(tk.Tk):
         #self.geometry("300x500")
         self.centrar_ventana( 300, 500)   # login centrado
         self.login_frame.pack()
-        self.config(menu=None)          #oculta el menu al cerrar sesion
+        self.config(menu=None)          #ocu12lta el menu al cerrar sesion
 
     def mostrar_pantalla_principal(self, id_usuario, nombre_usuario, rol):
         self.login_frame.pack_forget()

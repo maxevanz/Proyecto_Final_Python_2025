@@ -15,6 +15,7 @@ class VistaPropietario(tk.Frame):
         ###Cargar Formulario###
         self.crear_formulario()
 
+
         #Mostrar la lista de empleados
         self.mostrar_grilla()
         self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
@@ -25,9 +26,16 @@ class VistaPropietario(tk.Frame):
 
     ######METODOS###########
     def crear_formulario(self):
+
+        self.principal = tk.LabelFrame(self, text="Propietarios ", font=("Arial", 12))
+        self.principal.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.principal.columnconfigure(0, weight=1)  # formulario se expande
+        self.principal.columnconfigure(1, weight=0)  # botones fijos
+
+
         ######Seccion Formulario(label y entrys)
-        self.controles_formulario = tk.Frame(self)
-        self.controles_formulario.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+        self.controles_formulario = tk.Frame(self.principal)
+        self.controles_formulario.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         tk.Label(self.controles_formulario, text="Apellido:").grid(row=0, column=0, sticky="e")
         self.apellido_entry = tk.Entry(self.controles_formulario, width=50)
@@ -60,7 +68,7 @@ class VistaPropietario(tk.Frame):
 
 
         ####Seccion Botones
-        self.botones = tk.Frame(self)
+        self.botones = tk.Frame(self.principal)
         self.botones.grid(row=0, column=1, pady=10, padx=10, sticky="e")
 
         self.boton_crear = tk.Button(self.botones, text="Crear", command=self.nuevo_propietario)

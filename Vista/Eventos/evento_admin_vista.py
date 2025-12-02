@@ -236,7 +236,7 @@ class VistaAdminEvento(tk.Frame):
         self.detalle_win = None
 
     def cambiar_vista(self):
-        from Vista.evento_tarjeta_vista import VistaEventoTarjeta
+        from Vista.Eventos.evento_tarjeta_vista import VistaEventoTarjeta
         
         #limpiar el contenido actual
         for vista in self.master.winfo_children():

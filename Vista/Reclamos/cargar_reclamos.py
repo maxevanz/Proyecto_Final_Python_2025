@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from Modelo.reclamo import ReclamoModelo
 from Controlador.reclamoControlador import ReclamoControlador
 
-class VistaReclamos(tk.Frame):
+class VistaCargarReclamos(tk.Frame):
     def __init__(self, master=None, usuario_actual=None):
         super().__init__(master)
         self.usuario_actual = usuario_actual
@@ -36,7 +36,7 @@ class VistaReclamos(tk.Frame):
         self.botones = tk.Frame(self)
         self.botones.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
-        self.btn_agregar = tk.Button(self.botones, text="Enviar", command="self.nuevo_reclamo")
+        self.btn_agregar = tk.Button(self.botones, text="Enviar", command=self.nuevo_reclamo)
         self.btn_agregar.grid(row=0, column=1, pady=10)
         self.btn_editar = tk.Button(self.botones, text="Limpiar", command=self.limpiar)
         self.btn_editar.grid(row=1, column=1, pady=10)
@@ -72,6 +72,21 @@ class VistaReclamos(tk.Frame):
         if not tipo_reclamo or not descripcion:
             messagebox.showerror("ERROR","Tipo de Reclamo y Descripcion son obligatorios.")
             return
+        
+        reclamo = ReclamoModelo(
+            tipo=tipo_reclamo,
+            mensaje=descripcion,
+            foto=imagen_reclamo,
+            id_usuario=id_usuario
+        )
+        
+        exito, mensaje = self.controlador.nuevo_reclamo(reclamo)
+
+        if exito:
+            messagebox.showinfo("Éxito", mensaje)
+            self.limpiar()
+        else:
+            messagebox.showerror("ERROR", mensaje)
         
         
 

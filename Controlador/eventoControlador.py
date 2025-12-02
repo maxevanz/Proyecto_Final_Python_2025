@@ -143,7 +143,6 @@ class EventoControlador:
             if conn:
                 conn.close()
 
-
     def obtener_propietarios(self):
         try:
             conn = obtener_conexion()

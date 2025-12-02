@@ -25,32 +25,36 @@ class VistaEmpleado(tk.Frame):
 
     ######METODOS###########
     def crear_formulario(self):
+
+        
         ######Seccion Formulario(label y entrys)
         self.controles_formulario = tk.Frame(self)
         self.controles_formulario.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
-        tk.Label(self.controles_formulario, text="Apellido:").grid(row=0, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Empleados", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
+
+        tk.Label(self.controles_formulario, text="Apellido:").grid(row=1, column=0, sticky="e")
         self.apellido_entry = tk.Entry(self.controles_formulario, width=50)
-        self.apellido_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.apellido_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
-        tk.Label(self.controles_formulario, text="Nombre:").grid(row=1, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Nombre:").grid(row=2, column=0, sticky="e")
         self.nombre_entry = tk.Entry(self.controles_formulario, width=50)
-        self.nombre_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.nombre_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
 
-        tk.Label(self.controles_formulario, text="Correo:").grid(row=2, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Correo:").grid(row=3, column=0, sticky="e")
         self.correo_entry = tk.Entry(self.controles_formulario, width=50)
-        self.correo_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
+        self.correo_entry.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
-        tk.Label(self.controles_formulario, text="Telefono:").grid(row=3, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Telefono:").grid(row=4, column=0, sticky="e")
         #validacion
         vcmd = self.register(ValidadorCampos.validar_telefono)
         self.telefono_entry = tk.Entry(self.controles_formulario, validate="key", validatecommand=(vcmd, "%P"), width=50)
-        self.telefono_entry.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
+        self.telefono_entry.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
 
-        tk.Label(self.controles_formulario, text="Estado:").grid(row=4, column=0, sticky="e")
+        tk.Label(self.controles_formulario, text="Estado:").grid(row=5, column=0, sticky="e")
         self.estado_var = tk.BooleanVar()
         self.estado_check = tk.Checkbutton(self.controles_formulario, text="Estado", variable=self.estado_var, state=tk.DISABLED)
-        self.estado_check.grid(row=4, column=1, sticky="w")
+        self.estado_check.grid(row=5, column=1, sticky="w")
 
 
         ####Seccion Botones
