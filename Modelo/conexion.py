@@ -6,7 +6,7 @@ def obtener_conexion():
         host = "localhost",
         user = "root",
         password = "M@nudiaz1",
-        database = "Porteria"
+        database = "porteria"
         )
         
         print("Éxito")

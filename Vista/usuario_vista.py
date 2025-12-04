@@ -18,10 +18,11 @@ class VistaUsuario(tk.Frame):
 
     ######METODOS###########
     def crear_formulario(self):
+        tk.Label(self, text="Administrar Usuarios", font=("Arial", 12)).grid(row=0, column=0, padx=5, sticky="nw")
 
         ####SECCION LABEL Y ENTRYS####
         self.controles_formulario = tk.Frame(self)
-        self.controles_formulario.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+        self.controles_formulario.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
 
         
         tk.Label(self.controles_formulario, text="Nombre de Usuario: ").grid(row=0, column=0, sticky="e")
@@ -54,7 +55,7 @@ class VistaUsuario(tk.Frame):
         ####SECCION BOTONES####
 
         self.botones_frame = tk.Frame(self)
-        self.botones_frame.grid(row=0, column=1, pady=10, padx=10, sticky="e")
+        self.botones_frame.grid(row=1, column=1, pady=10, padx=10, sticky="e")
 
         self.boton_crear = tk.Button(self.botones_frame, text="Crear Usuario", command=self.crear_usuario)
         self.boton_crear.grid(row=0, column=0, pady=5)
@@ -70,7 +71,7 @@ class VistaUsuario(tk.Frame):
 
         ###Seccion Busqueda###
         self.busqueda_frame = tk.Frame(self)
-        self.busqueda_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+        self.busqueda_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
         self.busqueda_frame.columnconfigure(1, weight=1)
 
         tk.Label(self.busqueda_frame, text="Buscar: ").grid(row=0, column=0, sticky="w", padx=5)
@@ -82,7 +83,7 @@ class VistaUsuario(tk.Frame):
     def mostrar_grilla(self):       
         columnas = ("Id", "Usuario", "Rol", "Estado", "Nombre")
         self.grilla = ttk.Treeview(self, columns=columnas, show="headings")
-        self.grilla.grid(row=1, column=0, columnspan=2, padx=11, pady=10, sticky="nsew")
+        self.grilla.grid(row=3, column=0, columnspan=2, padx=11, pady=10, sticky="nsew")
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
@@ -91,7 +92,7 @@ class VistaUsuario(tk.Frame):
             self.grilla.column(col, width=100, anchor="center")
 
         self.grilla.bind("<<TreeviewSelect>>", self.seleccionar_usuario)
-        self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        self.grilla.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
         self.cargar_usuarios()
 

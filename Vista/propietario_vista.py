@@ -18,7 +18,6 @@ class VistaPropietario(tk.Frame):
 
         #Mostrar la lista de empleados
         self.mostrar_grilla()
-        self.grilla.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
         #Pintar las filas inactivas
         #self.grilla.tag_configure("estado0", foreground="red")  # para pintar los empleados Inactivos
         self.grilla.tag_configure("estado0", background="#f2dede")  # rojo claro
@@ -26,16 +25,11 @@ class VistaPropietario(tk.Frame):
 
     ######METODOS###########
     def crear_formulario(self):
-
-        self.principal = tk.LabelFrame(self, text="Propietarios ", font=("Arial", 12))
-        self.principal.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.principal.columnconfigure(0, weight=1)  # formulario se expande
-        self.principal.columnconfigure(1, weight=0)  # botones fijos
-
+        tk.Label(self, text="Administrar Propietarios", font=("Arial", 12)).grid(row=0, column=0, padx=5, sticky="nw")
 
         ######Seccion Formulario(label y entrys)
-        self.controles_formulario = tk.Frame(self.principal)
-        self.controles_formulario.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        self.controles_formulario = tk.Frame(self)
+        self.controles_formulario.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
         tk.Label(self.controles_formulario, text="Apellido:").grid(row=0, column=0, sticky="e")
         self.apellido_entry = tk.Entry(self.controles_formulario, width=50)
@@ -68,8 +62,8 @@ class VistaPropietario(tk.Frame):
 
 
         ####Seccion Botones
-        self.botones = tk.Frame(self.principal)
-        self.botones.grid(row=0, column=1, pady=10, padx=10, sticky="e")
+        self.botones = tk.Frame(self)
+        self.botones.grid(row=1, column=1, pady=10, padx=10, sticky="e")
 
         self.boton_crear = tk.Button(self.botones, text="Crear", command=self.nuevo_propietario)
         self.boton_crear.grid(row=0, column=0, pady=5)
@@ -82,7 +76,7 @@ class VistaPropietario(tk.Frame):
 
         ###Seccion Busqueda###
         self.busqueda_frame = tk.Frame(self)
-        self.busqueda_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+        self.busqueda_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
         self.busqueda_frame.columnconfigure(1, weight=1)
 
         tk.Label(self.busqueda_frame, text="Buscar: ").grid(row=0, column=0, sticky="w", padx=5)
@@ -93,17 +87,19 @@ class VistaPropietario(tk.Frame):
 
     def mostrar_grilla(self):
         # TreeView para mostrar empleados
-        self.grilla = ttk.Treeview(self, columns=("id","Apellido","Nombre","DNI","Telefono","Estado","Departamento"), show="headings")
-        self.grilla.grid(row=6, column=0, columnspan=2, padx=1, pady=10, sticky="nsew")
-        self.rowconfigure(6, weight=1)
+        columnas = ("Id","Apellido","Nombre","DNI","Telefono","Estado","Departamento")
+        self.grilla = ttk.Treeview(self, columns=columnas, show="headings")
+        self.grilla.grid(row=3, column=0, columnspan=2, padx=11, pady=10, sticky="nsew")
+        #self.rowconfigure(6, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        for col in ("id","Apellido","Nombre","DNI","Telefono","Estado","Departamento"):
-            self.grilla.heading(col, text=col)
-            self.grilla.column(col, width=100)
+        for col in columnas:
+            self.grilla.heading(col, text=col.capitalize())
+            self.grilla.column(col, width=100, anchor="center")
 
         self.grilla.bind("<<TreeviewSelect>>", self.seleccionar_propietario)
+        self.grilla.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
         self.actualizar_lista()
 

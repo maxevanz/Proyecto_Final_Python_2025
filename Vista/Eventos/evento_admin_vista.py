@@ -1,6 +1,6 @@
+import os
 import tkinter as tk
-from tkinter import Label, Toplevel, ttk,messagebox, filedialog
-from PIL import Image, ImageTk
+from tkinter import ttk,messagebox, filedialog
 from Modelo.evento import EventoModelo
 from Controlador.eventoControlador import EventoControlador
 
@@ -14,18 +14,19 @@ class VistaAdminEvento(tk.Frame):
         self.evento_seleccionado = None
 
         self.controlador = EventoControlador()
-        self.image_path = None
+        self.ruta_imagen = None
         self.crear_layout()
 
         self.vista_actual = "admin"
 
 
     def crear_layout(self):
-        self.columnconfigure(1, weight=1)
+        tk.Label(self, text="Administrar Eventos", font=("Arial", 12)).grid(row=0, column=0, padx=5, sticky="nw")
+        self.columnconfigure(1, weight=1)       
 
         #Formulario
         self.form_frame = tk.LabelFrame(self, text="Agregar Evento")
-        self.form_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
+        self.form_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nw")
 
         tk.Label(self.form_frame, text="Tipo de evento:").grid(row=0, column=0, sticky="e")
         self.tipo_combo = ttk.Combobox(self.form_frame, values=["ingreso", "egreso", "paqueteria", "visitas", "otros"], state="readonly", width=50)
@@ -47,7 +48,7 @@ class VistaAdminEvento(tk.Frame):
 
         #Botones
         self.botones = tk.Frame(self)
-        self.botones.grid(row=0, column=1, padx=10, pady=10, sticky="e")
+        self.botones.grid(row=1, column=1, padx=10, pady=10, sticky="e")
 
         self.btn_agregar = tk.Button(self.botones, text="Agregar evento", command=self.agregar_evento)
         self.btn_agregar.grid(row=0, column=1, pady=10)
@@ -59,18 +60,21 @@ class VistaAdminEvento(tk.Frame):
         self.btn_cambiar_vista.grid(row=3, column=1, pady=10)
 
         #Lista de Eventos
-        self.grilla = ttk.Treeview(self, columns=("Tipo", "Fecha", "Propietario"), show="headings")
+        columnas = ("Tipo", "Fecha", "Propietario")
+        self.grilla = ttk.Treeview(self, columns=columnas, show="headings")
         self.grilla.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
         self.rowconfigure(6, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        for col in ("Tipo","Fecha","Propietario"):
-            self.grilla.heading(col, text=col)
-            self.grilla.column(col, width=100)       
+        for col in columnas:
+            self.grilla.heading(col, text=col.capitalize())
+            self.grilla.column(col, width=100, anchor="center")    
 
         self.grilla.bind("<<TreeviewSelect>>", self.seleccionar_evento)
         self.grilla.bind("<Double-1>", self.ver_evento)
+
+
         self.cargar_eventos()
 
     def seleccionar_imagen(self):
@@ -99,11 +103,12 @@ class VistaAdminEvento(tk.Frame):
             self.obs_text.insert("1.0", self.evento_seleccionado.observaciones)
             # Mostrar la ruta de la imagen en el Label
             if self.evento_seleccionado.imagen:
-                self.lbl_imagen.config(text="")
-                self.lbl_imagen.config(text=f"{self.evento_seleccionado.imagen}")
+                nombre = os.path.basename(self.evento_seleccionado.imagen)
+                self.lbl_imagen.config(text=f"{nombre}")
+                self.ruta_imagen = self.evento_seleccionado.imagen
             else:
                 self.lbl_imagen.config(text="Sin imagen asociada")
-                self.ruta_imagen = "Sin imagen asociada"
+                self.ruta_imagen = None
         
     def cargar_propietarios(self):
         resultados = self.controlador.obtener_propietarios()
@@ -152,7 +157,8 @@ class VistaAdminEvento(tk.Frame):
         
         propietario = self.propietario_combo.get()
         id_propietario = self.mapa_propietarios[propietario]
-        imagen = self.lbl_imagen.cget("text")
+        #imagen = self.lbl_imagen.cget("text")
+        imagen = self.ruta_imagen
 
         if id_propietario is None:
             messagebox.showerror("Error", f"Propietario '{propietario}' no encontrado en el mapa")

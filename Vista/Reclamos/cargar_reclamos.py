@@ -1,14 +1,19 @@
+from datetime import date
 import tkinter as tk
 from tkinter import Label, Toplevel, ttk,messagebox, filedialog
 from PIL import Image, ImageTk
+from fpdf import FPDF
 from Modelo.reclamo import ReclamoModelo
 from Controlador.reclamoControlador import ReclamoControlador
+from Utilidades.PDFs.funciones_para_pdfs import FuncionesParaPDFS
+
 
 class VistaCargarReclamos(tk.Frame):
     def __init__(self, master=None, usuario_actual=None):
         super().__init__(master)
         self.usuario_actual = usuario_actual
         self.controlador = ReclamoControlador()
+        self.ruta_imagen = None
 
         self.crear_formulario()
 
@@ -40,7 +45,7 @@ class VistaCargarReclamos(tk.Frame):
         self.btn_agregar.grid(row=0, column=1, pady=10)
         self.btn_editar = tk.Button(self.botones, text="Limpiar", command=self.limpiar)
         self.btn_editar.grid(row=1, column=1, pady=10)
-        self.btn_limpiar = tk.Button(self.botones, text="Historial de Reclamos", command="self.historial_reclamos")
+        self.btn_limpiar = tk.Button(self.botones, text="Historial de Reclamos", command=self.generar_pdf_por_propietario)
         self.btn_limpiar.grid(row=3, column=1, pady=10)
 
     def seleccionar_imagen(self):
@@ -88,6 +93,68 @@ class VistaCargarReclamos(tk.Frame):
         else:
             messagebox.showerror("ERROR", mensaje)
         
+    def generar_pdf_por_propietario(self):
+        reclamos = self.controlador.obtener_reclamos_por_usuario(self.usuario_actual)
+
+        if not reclamos:
+            messagebox.showinfo("Atención", "Aún no generó ningun reclamo.")
+            return
         
+        #Ventana para elegir ubicacion y nombre
+        nombre_archivo = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            initialfile=f"Reporte_{date.today().strftime('%Y-%m-%d')}.pdf",
+            title="Guardar como"
+        )
+
+        if not nombre_archivo:  #Si el usuario cancela
+            print("Exportacion cancelada")
+            return        
+
+        pdf = FPDF(orientation="L", unit="mm", format="A4")
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+
+        # Título
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(0, 10, "Lista de Reclamos", ln=True, align="C")
+        pdf.ln(5)
+
+        # Encabezados
+        pdf.set_font("Arial", 'B', 10)        
+        anchos  = [50, 25, 50, 100, 30]
+        alto_linea = 7
+        headers = ["Propietario", "Tipo", "Fecha", "Mensaje", "Estado"]
+
+        x_ini = pdf.get_x()
+        y_ini = pdf.get_y()
+        x = x_ini
+
+        for i, h in enumerate(headers):
+            pdf.rect(x, y_ini, anchos[i], alto_linea + 3)
+            pdf.set_xy(x, y_ini)
+            pdf.cell(anchos[i], alto_linea + 3, h, 0, 0, "C")
+            x += anchos[i]
+        pdf.set_xy(x_ini, y_ini + alto_linea + 3)
+
+        # Cuerpo
+        pdf.set_font("Arial", size=10)
+        pdf.set_font("Arial", size=10)
+        for reclamo in reclamos:
+            propietario = reclamo.nombre_propietario
+            tipo = reclamo.tipo 
+            fecha = str(reclamo.fecha) 
+            mensaje = reclamo.mensaje 
+            estado = "Pendiente" if reclamo.estado == 1 else "Revisado"
+
+            FuncionesParaPDFS.dibujar_fila(pdf, [str(propietario), str(tipo), str(fecha), str(mensaje), str(estado)], anchos, alto_linea)
+
+        #Guardar archivo
+        pdf.output(nombre_archivo)
+        print(f"PDF generado: reclamos_propietario_{self.usuario_actual}.pdf")
+
+    def historial_reclamos(self):
+        pass
 
 
