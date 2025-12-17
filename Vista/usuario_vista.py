@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Controlador.usuarioControlador import UsuarioControlador
 from Modelo.usuario import UsuarioModelo
+from Utilidades.estilos import configurar_estilos
+from Utilidades.icon_loader import cargar_icono
 from Utilidades.validador_campos import ValidadorCampos
 
 class VistaUsuario(tk.Frame):
@@ -10,6 +12,7 @@ class VistaUsuario(tk.Frame):
         self.controlador = UsuarioControlador()
         self.usuario_actual = usuario_Actual
         self.usuario_id = None
+        configurar_estilos()
 
         self.grid(row=0, column=0, sticky="nsew")              
         self.crear_formulario()
@@ -53,21 +56,33 @@ class VistaUsuario(tk.Frame):
         self.estado_check.grid(row=4, column=1, padx=5)
 
         ####SECCION BOTONES####
+        self.icon_nuevo = cargar_icono("boton-agregar.png")
+        self.icon_editar = cargar_icono("boton-editar.png")
+        self.icon_eliminar = cargar_icono("boton-borrar.png")
+        self.icon_limpiar = cargar_icono("boton-limpiar.png")
 
         self.botones_frame = tk.Frame(self)
         self.botones_frame.grid(row=1, column=1, pady=10, padx=10, sticky="e")
 
-        self.boton_crear = tk.Button(self.botones_frame, text="Crear Usuario", command=self.crear_usuario)
-        self.boton_crear.grid(row=0, column=0, pady=5)
+        self.boton_crear = ttk.Button(self.botones_frame, text="Crear Usuario", image=self.icon_nuevo, 
+                                     compound="right", style="Nuevo.TButton",
+                                     command=self.crear_usuario)
+        self.boton_crear.grid(row=0, column=0, pady=1)
 
-        self.boton_editar = tk.Button(self.botones_frame, text="Editar Usuario", command=self.editar_usuario)
-        self.boton_editar.grid(row=1, column=0, pady=5)
+        self.boton_editar = ttk.Button(self.botones_frame, text="Editar Usuario", image=self.icon_editar, 
+                                       compound="right", style="Editar.TButton",
+                                       command=self.editar_usuario)
+        self.boton_editar.grid(row=1, column=0, pady=1)
 
-        self.boton_eliminar = tk.Button(self.botones_frame, text="Activar/Desactivar Usuario", command=self.eliminar_usuario)
-        self.boton_eliminar.grid(row=2, column=0, pady=5)
+        self.boton_eliminar = ttk.Button(self.botones_frame, text="Activar/Desactivar Usuario", 
+                                         image=self.icon_eliminar, compound="right", style="Eliminar.TButton",
+                                         command=self.eliminar_usuario)
+        self.boton_eliminar.grid(row=2, column=0, pady=1)
 
-        self.boton_eliminar = tk.Button(self.botones_frame, text="Limpiar", command=self.limpiar_formulario)
-        self.boton_eliminar.grid(row=3, column=0, pady=5)
+        self.boton_limpiar = ttk.Button(self.botones_frame, text="Limpiar", image=self.icon_limpiar, 
+                                        compound="right", style="Limpiar.TButton",
+                                        command=self.limpiar_formulario)
+        self.boton_limpiar.grid(row=3, column=0, pady=1)
 
         ###Seccion Busqueda###
         self.busqueda_frame = tk.Frame(self)

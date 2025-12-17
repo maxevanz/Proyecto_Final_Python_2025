@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Controlador.propietarioControlador import PropietarioControlador
 from Modelo.propietario import PropietarioModelo
+from Utilidades.estilos import configurar_estilos
+from Utilidades.icon_loader import cargar_icono
 from Utilidades.validador_campos import ValidadorCampos
 
 
@@ -11,6 +13,7 @@ class VistaPropietario(tk.Frame):
         super().__init__(master)
         self.controlador = PropietarioControlador()
         self.propietario_seleccionado = None
+        configurar_estilos()
 
         ###Cargar Formulario###
         self.crear_formulario()
@@ -62,17 +65,30 @@ class VistaPropietario(tk.Frame):
 
 
         ####Seccion Botones
+        self.icon_nuevo = cargar_icono("boton-agregar.png")
+        self.icon_editar = cargar_icono("boton-editar.png")
+        self.icon_eliminar = cargar_icono("boton-borrar.png")
+        self.icon_limpiar = cargar_icono("boton-limpiar.png")
+
         self.botones = tk.Frame(self)
         self.botones.grid(row=1, column=1, pady=10, padx=10, sticky="e")
 
-        self.boton_crear = tk.Button(self.botones, text="Crear", command=self.nuevo_propietario)
-        self.boton_crear.grid(row=0, column=0, pady=5)
-        self.boton_editar = tk.Button(self.botones, text="Editar", command=self.editar_propietario)
-        self.boton_editar.grid(row=1, column=0, pady=5)
-        self.boton_eliminar = tk.Button(self.botones, text="Eliminar", command=self.eliminar_propietario)
-        self.boton_eliminar.grid(row=2, column=0, pady=5)
-        self.boton_limpiar = tk.Button(self.botones, text="Limpiar", command=self.limpiar_campos)
-        self.boton_limpiar.grid(row=3, column=0, pady=5)
+        self.boton_crear = ttk.Button(self.botones, text="Crear", image=self.icon_nuevo, 
+                                     compound="right", style="Nuevo.TButton",
+                                     command=self.nuevo_propietario)
+        self.boton_crear.grid(row=0, column=0, pady=2, padx=2)
+        self.boton_editar = ttk.Button(self.botones, text="Editar", image=self.icon_editar, 
+                                       compound="right", style="Editar.TButton",
+                                       command=self.editar_propietario)
+        self.boton_editar.grid(row=1, column=0, pady=2, padx=2)
+        self.boton_eliminar = ttk.Button(self.botones, text="Eliminar", image=self.icon_eliminar, 
+                                         compound="right", style="Eliminar.TButton",
+                                         command=self.eliminar_propietario)
+        self.boton_eliminar.grid(row=2, column=0, pady=2, padx=2)
+        self.boton_limpiar = ttk.Button(self.botones, text="Limpiar", image=self.icon_limpiar, 
+                                        compound="right", style="Limpiar.TButton",
+                                        command=self.limpiar_campos)
+        self.boton_limpiar.grid(row=3, column=0, pady=2, padx=2)
 
         ###Seccion Busqueda###
         self.busqueda_frame = tk.Frame(self)

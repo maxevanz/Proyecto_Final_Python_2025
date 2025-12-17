@@ -45,5 +45,7 @@ class App(tk.Tk):
 
 
 if __name__ == "__main__":
+
     app = App()
+    app.iconbitmap("Utilidades/icon/edificio.ico")
     app.mainloop()
