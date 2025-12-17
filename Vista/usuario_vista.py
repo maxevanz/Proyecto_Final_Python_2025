@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Controlador.usuarioControlador import UsuarioControlador
 from Modelo.usuario import UsuarioModelo
-from Utilidades.estilos import configurar_estilos
+from Utilidades.styles.estilos import Estilos
 from Utilidades.icon_loader import cargar_icono
 from Utilidades.validador_campos import ValidadorCampos
 
@@ -12,7 +12,7 @@ class VistaUsuario(tk.Frame):
         self.controlador = UsuarioControlador()
         self.usuario_actual = usuario_Actual
         self.usuario_id = None
-        configurar_estilos()
+        Estilos.configurar_estilos()
 
         self.grid(row=0, column=0, sticky="nsew")              
         self.crear_formulario()

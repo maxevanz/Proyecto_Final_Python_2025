@@ -8,16 +8,23 @@ from Utilidades.PDFs.funciones_para_pdfs import FuncionesParaPDFS
 from datetime import date
 from fpdf import FPDF
 
+from Utilidades.styles.estilos import Estilos
+from Utilidades.icon_loader import cargar_icono
+
 class VistaVerReclamos(tk.Frame):
     def __init__(self, master=None, usuario_actual=None):
         super().__init__(master)
         self.usuario_actual = usuario_actual
         self.controlador = ReclamoControlador()
+        Estilos.configurar_estilos()
 
         self.crear_formulario_busqueda()
         self.mostrar_grilla()
 
     def crear_formulario_busqueda(self):
+        self.icon_limpiar = cargar_icono("boton-limpiar.png")
+        self.icon_pdf = cargar_icono("boton-pdf.png")
+        self.icon_excel = cargar_icono("boton-excel.png")
 
         tk.Label(self, text="Administrar Reclamos", font=("Arial", 12)).grid(row=0, column=0, padx=5, sticky="nw")
 
@@ -87,13 +94,18 @@ class VistaVerReclamos(tk.Frame):
         self.botones_frame.grid(row=1, column=1,  sticky="e", padx=5, pady=5)
         self.botones_frame.columnconfigure(0, weight=1)
 
-        self.boton_limpiar_campos = tk.Button(self.botones_frame, text="Limpiar Campos", command=self.limpiar)
+        self.boton_limpiar_campos = ttk.Button(self.botones_frame, text="Limpiar Campos", image=self.icon_limpiar, 
+                                               compound="right", style="Limpiar.TButton",
+                                               command=self.limpiar)
         self.boton_limpiar_campos.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
-        self.boton_generar_pdf = tk.Button(self.botones_frame, text="Exportar a PDF", command=self.exportar_pdf)
+        self.boton_generar_pdf = ttk.Button(self.botones_frame, text="Exportar a PDF", image=self.icon_pdf, 
+                                            compound="right", style="PDF.TButton",
+                                            command=self.exportar_pdf)
         self.boton_generar_pdf.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
-        self.boton_generar_excel = tk.Button(self.botones_frame, text="Exportar a Excel")
+        self.boton_generar_excel = ttk.Button(self.botones_frame, text="Exportar a Excel", image=self.icon_excel, 
+                                              compound="right", style="EXCEL.TButton")
         self.boton_generar_excel.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
 
     def mostrar_grilla(self):

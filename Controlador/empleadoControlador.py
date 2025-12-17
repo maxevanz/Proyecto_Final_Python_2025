@@ -55,6 +55,8 @@ class EmpleadoControlador:
             else:
                 return False, f"Faltan completar campos"
 
+        except mysql.connector.IntegrityError as e:
+            return False, "⚠️ El correo ya existe en la base de datos"
         except Exception as e:
             return False, f"Error al crear el empleado: {e}"
         finally:
@@ -75,6 +77,9 @@ class EmpleadoControlador:
                 return True, "Empleado actualizado correctamente"
             else:
                 return False, f"Apellido, Nombre y Correo son campos OBLIGATORIOS."
+            
+        except mysql.connector.IntegrityError as e:
+            return False, "⚠️ El correo ya existe en la base de datos"
         except Exception as e:
             return False, f"Error al editar el empleado: ",e
         

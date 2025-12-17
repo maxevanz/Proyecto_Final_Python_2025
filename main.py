@@ -12,7 +12,7 @@ class App(tk.Tk):
         self.pantalla_principal_frame = PantallaPrincipalFrame(self, self.mostrar_login)
 
         #self.geometry("300x500")
-        self.centrar_ventana(300, 500)   # login centrado
+        self.centrar_ventana(400, 500)   # login centrado
         self.resizable(False, False)
         
         self.login_frame.pack()
@@ -20,7 +20,7 @@ class App(tk.Tk):
     def mostrar_login(self):
         self.pantalla_principal_frame.pack_forget()
         #self.geometry("300x500")
-        self.centrar_ventana( 300, 500)   # login centrado
+        self.centrar_ventana( 400, 500)   # login centrado
         self.login_frame.pack()
         self.config(menu=None)          #ocu12lta el menu al cerrar sesion
 

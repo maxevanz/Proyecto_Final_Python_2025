@@ -4,7 +4,7 @@ from tkinter import PhotoImage, ttk, messagebox
 from Controlador.empleadoControlador import EmpleadoControlador
 from Modelo.empleado import EmpleadoModelo
 from Utilidades.validador_campos import ValidadorCampos
-from Utilidades.estilos import configurar_estilos
+from Utilidades.styles.estilos import Estilos
 from Utilidades.icon_loader import cargar_icono
 
 
@@ -14,7 +14,7 @@ class VistaEmpleado(tk.Frame):
         super().__init__(master)
         self.controlador = EmpleadoControlador()
         self.empleado_seleccionado = None
-        configurar_estilos()
+        Estilos.configurar_estilos()
 
         ###Cargar Formulario###
         self.crear_formulario()
@@ -199,12 +199,15 @@ class VistaEmpleado(tk.Frame):
             estado=estado
         )
 
-        exito, mensaje = self.controlador.nuevo_empleado(empleado)
-        messagebox.showinfo("Resultado", mensaje)
+        exito, mensaje = self.controlador.nuevo_empleado(empleado)        
         
         if exito:
+            messagebox.showinfo("Resultado", mensaje)
             self.actualizar_lista()
             self.limpiar_campos()
+        else:
+            messagebox.showerror("Resultado", mensaje)
+
 
     def editar_empleado(self):
         if not self.empleado_seleccionado:

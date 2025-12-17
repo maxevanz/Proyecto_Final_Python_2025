@@ -6,6 +6,8 @@ from fpdf import FPDF
 from Modelo.reclamo import ReclamoModelo
 from Controlador.reclamoControlador import ReclamoControlador
 from Utilidades.PDFs.funciones_para_pdfs import FuncionesParaPDFS
+from Utilidades.styles.estilos import Estilos
+from Utilidades.icon_loader import cargar_icono
 
 
 class VistaCargarReclamos(tk.Frame):
@@ -14,10 +16,16 @@ class VistaCargarReclamos(tk.Frame):
         self.usuario_actual = usuario_actual
         self.controlador = ReclamoControlador()
         self.ruta_imagen = None
+        Estilos.configurar_estilos()
 
         self.crear_formulario()
 
     def crear_formulario(self):
+        self.icon_limpiar = cargar_icono("boton-limpiar.png")
+        self.icon_enviar = cargar_icono("boton-enviar.png")
+        self.icon_pdf = cargar_icono("boton-pdf.png")
+        self.icon_subir = cargar_icono("boton-subir-imagen.png")
+
         self.columnconfigure(1, weight=1)
 
         #Formulario
@@ -32,7 +40,9 @@ class VistaCargarReclamos(tk.Frame):
         self.descrp = tk.Text(self.form_frame, height=4, width=30)
         self.descrp.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
-        self.btn_imagen = tk.Button(self.form_frame, text="Seleccionar imagen", command=self.seleccionar_imagen)
+        self.btn_imagen = ttk.Button(self.form_frame, text="Seleccionar imagen", image=self.icon_subir, 
+                                     compound="left",
+                                     command=self.seleccionar_imagen)
         self.btn_imagen.grid(row=2, column=0, padx=5, pady=5)
         self.lbl_imagen = tk.Label(self.form_frame, text="Ninguna imagen seleccionada")
         self.lbl_imagen.grid(row=3, column=1, padx=10)
@@ -41,11 +51,17 @@ class VistaCargarReclamos(tk.Frame):
         self.botones = tk.Frame(self)
         self.botones.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
-        self.btn_agregar = tk.Button(self.botones, text="Enviar", command=self.nuevo_reclamo)
+        self.btn_agregar = ttk.Button(self.botones, text="Enviar", image=self.icon_enviar, 
+                                      compound="right", style="Enviar.TButton",
+                                      command=self.nuevo_reclamo)
         self.btn_agregar.grid(row=0, column=1, pady=10)
-        self.btn_editar = tk.Button(self.botones, text="Limpiar", command=self.limpiar)
+        self.btn_editar = ttk.Button(self.botones, text="Limpiar", image=self.icon_limpiar, 
+                                     compound="right", style="Limpiar.TButton",
+                                     command=self.limpiar)
         self.btn_editar.grid(row=1, column=1, pady=10)
-        self.btn_limpiar = tk.Button(self.botones, text="Historial de Reclamos", command=self.generar_pdf_por_propietario)
+        self.btn_limpiar = ttk.Button(self.botones, text="Historial de Reclamos", image=self.icon_pdf, 
+                                      compound="right", style="PDF.TButton",
+                                      command=self.generar_pdf_por_propietario)
         self.btn_limpiar.grid(row=3, column=1, pady=10)
 
     def seleccionar_imagen(self):

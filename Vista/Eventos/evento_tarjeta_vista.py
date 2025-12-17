@@ -4,19 +4,24 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from Controlador.eventoControlador import EventoControlador
+from Utilidades.styles.estilos import Estilos
+from Utilidades.icon_loader import cargar_icono
 
 #from Vista.evento_admin_vista import VistaAdminEvento
 
 class VistaEventoTarjeta(tk.Frame):
     def __init__(self, parent, usuario_actual):
         super().__init__(parent)
+        Estilos.configurar_estilos()
+        self.icon_cambiar = cargar_icono("boton-cambiar.png")
+        self.icon_zoom = cargar_icono("boton-zoom.png")
 
         self.usuario_actual = usuario_actual
         self.controlador = EventoControlador()
         self.crear_contenedor_tarjetas()
 
     
-    def crear_contenedor_tarjetas(self):
+    def crear_contenedor_tarjetas(self):       
         canvas = tk.Canvas(self)
         scrollbar = tk.Scrollbar(self, orient="vertical", command=canvas.yview)
         self.tarjeta_frame = tk.Frame(canvas)
@@ -37,7 +42,9 @@ class VistaEventoTarjeta(tk.Frame):
         self.cambiar_frame = tk.LabelFrame(self, text="Cambiar vista")
         self.cambiar_frame.pack(padx=10, pady=10)
 
-        self.btn_cambiar_vista = tk.Button(self.cambiar_frame, text="Cambiar Vista", command=self.cambiar_vista)
+        self.btn_cambiar_vista = ttk.Button(self.cambiar_frame, text="Cambiar Vista", image=self.icon_cambiar, 
+                                            compound="right", style="Cambiar.TButton",
+                                            command=self.cambiar_vista)
         self.btn_cambiar_vista.pack(pady=10)
 
     def cargar_tarjetas(self):
@@ -47,6 +54,7 @@ class VistaEventoTarjeta(tk.Frame):
             self.crear_tarjeta(evento)
 
     def crear_tarjeta(self, evento):
+        
         tarjeta = tk.Frame(self.tarjeta_frame, bd=1, relief="solid", padx=10, pady=10)
         tarjeta.pack(pady=5, padx=10, fill="x")
 
@@ -59,7 +67,9 @@ class VistaEventoTarjeta(tk.Frame):
         #Botones
         btn_frame = tk.Frame(tarjeta)
         btn_frame.pack(anchor="w", pady=5)
-        btn_ver_imagen = tk.Button(btn_frame, text="Ver imagen", command=lambda: self.ver_imagen(evento))
+        btn_ver_imagen = ttk.Button(btn_frame, text="Ver imagen", image=self.icon_zoom,
+                                    compound="right",
+                                    command=lambda: self.ver_imagen(evento))
         btn_ver_imagen.pack(side="left", padx=2)
         #Imagen miniatura
         if evento.imagen:

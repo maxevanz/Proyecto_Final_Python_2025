@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Controlador.propietarioControlador import PropietarioControlador
 from Modelo.propietario import PropietarioModelo
-from Utilidades.estilos import configurar_estilos
+from Utilidades.styles.estilos import Estilos
 from Utilidades.icon_loader import cargar_icono
 from Utilidades.validador_campos import ValidadorCampos
 
@@ -13,7 +13,7 @@ class VistaPropietario(tk.Frame):
         super().__init__(master)
         self.controlador = PropietarioControlador()
         self.propietario_seleccionado = None
-        configurar_estilos()
+        Estilos.configurar_estilos()
 
         ###Cargar Formulario###
         self.crear_formulario()
@@ -208,11 +208,14 @@ class VistaPropietario(tk.Frame):
         )
 
         exito, mensaje = self.controlador.nuevo_propietario(propietario)
-        messagebox.showinfo("Resultado", mensaje)
+        
         
         if exito:
+            messagebox.showinfo("Resultado", mensaje)
             self.actualizar_lista()
             self.limpiar_campos()
+        else:
+            messagebox.showerror("Error", mensaje)
 
     def editar_propietario(self):
         if not self.propietario_seleccionado:

@@ -38,7 +38,7 @@ def crear_esquema_y_tablas():
           id INT NOT NULL AUTO_INCREMENT,
           Apellido VARCHAR(50) NOT NULL,
           Nombre VARCHAR(50) NOT NULL,
-          Correo VARCHAR(150) NOT NULL,
+          Correo VARCHAR(150) UNIQUE NOT NULL,
           Telefono VARCHAR(15) NOT NULL,
           Estado TINYINT(1) NOT NULL DEFAULT '1',
           PRIMARY KEY (id)
@@ -50,7 +50,7 @@ def crear_esquema_y_tablas():
           Id INT NOT NULL AUTO_INCREMENT,
           Apellido VARCHAR(50) NOT NULL,
           Nombre VARCHAR(50) NOT NULL,
-          DNI VARCHAR(15) NOT NULL,
+          DNI VARCHAR(15) UNIQUE NOT NULL,
           Telefono VARCHAR(15) NOT NULL,
           Estado TINYINT(1) NOT NULL DEFAULT '1',
           Departamento VARCHAR(20) NOT NULL,

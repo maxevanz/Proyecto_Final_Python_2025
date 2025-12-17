@@ -3,12 +3,15 @@ import tkinter as tk
 from tkinter import ttk,messagebox, filedialog
 from Modelo.evento import EventoModelo
 from Controlador.eventoControlador import EventoControlador
+from Utilidades.styles.estilos import Estilos
+from Utilidades.icon_loader import cargar_icono
 
 #from Vista.evento_tarjeta_vista import VistaEventoTarjeta
 
 class VistaAdminEvento(tk.Frame):
     def __init__(self, master=None, usuario_actual=None):
         super().__init__(master)
+        Estilos.configurar_estilos()
 
         self.usuario_actual = usuario_actual
         self.evento_seleccionado = None
@@ -41,22 +44,40 @@ class VistaAdminEvento(tk.Frame):
         self.obs_text = tk.Text(self.form_frame, height=4, width=30)
         self.obs_text.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
 
-        self.btn_imagen = tk.Button(self.form_frame, text="Seleccionar imagen", command=self.seleccionar_imagen)
+        self.icon_subir = cargar_icono("boton-subir-imagen.png")
+        self.btn_imagen = ttk.Button(self.form_frame, text="Seleccionar imagen", image=self.icon_subir, 
+                                    compound="left",
+                                    command=self.seleccionar_imagen)
         self.btn_imagen.grid(row=4, column=0, padx=5, pady=5)
         self.lbl_imagen = tk.Label(self.form_frame, text="Ninguna imagen seleccionada")
         self.lbl_imagen.grid(row=4, column=1, padx=10)
 
         #Botones
+        self.icon_nuevo = cargar_icono("boton-agregar.png")
+        self.icon_editar = cargar_icono("boton-editar.png")
+        self.icon_eliminar = cargar_icono("boton-borrar.png")
+        self.icon_limpiar = cargar_icono("boton-limpiar.png")
+        self.icon_cambiar = cargar_icono("boton-cambiar.png")
+        
+
         self.botones = tk.Frame(self)
         self.botones.grid(row=1, column=1, padx=10, pady=10, sticky="e")
 
-        self.btn_agregar = tk.Button(self.botones, text="Agregar evento", command=self.agregar_evento)
+        self.btn_agregar = ttk.Button(self.botones, text="Agregar evento", image=self.icon_nuevo, 
+                                     compound="right", style="Nuevo.TButton",
+                                     command=self.agregar_evento)
         self.btn_agregar.grid(row=0, column=1, pady=10)
-        self.btn_editar = tk.Button(self.botones, text="Editar evento", command=self.editar_evento)
+        self.btn_editar = ttk.Button(self.botones, text="Editar evento", image=self.icon_editar, 
+                                     compound="right", style="Editar.TButton",
+                                     command=self.editar_evento)
         self.btn_editar.grid(row=1, column=1, pady=10)
-        self.btn_limpiar = tk.Button(self.botones, text="Limpiar", command=self.limpiar)
+        self.btn_limpiar = ttk.Button(self.botones, text="Limpiar", image=self.icon_limpiar, 
+                                      compound="right", style="Limpiar.TButton",
+                                      command=self.limpiar)
         self.btn_limpiar.grid(row=2, column=1, pady=10)
-        self.btn_cambiar_vista = tk.Button(self.botones, text="Cambiar Vista", command=self.cambiar_vista)
+        self.btn_cambiar_vista = ttk.Button(self.botones, text="Cambiar Vista", image=self.icon_cambiar, 
+                                            compound="right", style="Cambiar.TButton",
+                                            command=self.cambiar_vista)
         self.btn_cambiar_vista.grid(row=3, column=1, pady=10)
 
         #Lista de Eventos
